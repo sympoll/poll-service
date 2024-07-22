@@ -1,5 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.answer.AnswerResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -50,4 +52,28 @@ public class Poll {
     @JoinColumn(name = "poll_id")
     private List<Answer> answersList;
 
+
+    /**
+     * @return A PollResponse representation if this poll
+     */
+    public PollResponse toPollResponse(){
+        return new PollResponse(
+                this.getPollId(),
+                this.getTitle(),
+                this.getDescription(),
+                this.getNumAnswersAllowed(),
+                this.getCreatorId(),
+                this.getGroupId(),
+                this.getTimeCreated(),
+                this.getTimeUpdated(),
+                this.getTimeEnds(),
+
+                /* Convert Answers to answer responses */
+                this.getAnswersList().stream().map(answer -> new AnswerResponse(
+                        answer.getAnswerId(),
+                        answer.getAnswerOrdinal(),
+                        answer.getAnswerContent(),
+                        answer.getNumberOfVotes()
+                )).toList());
+    }
 }

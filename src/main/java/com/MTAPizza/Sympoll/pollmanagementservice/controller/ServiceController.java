@@ -18,7 +18,7 @@ public class ServiceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Poll createPoll(@RequestBody PollCreateRequest pollCreateRequest){
+    public PollResponse createPoll(@RequestBody PollCreateRequest pollCreateRequest){
         return pollService.createPoll(pollCreateRequest);
     }
 

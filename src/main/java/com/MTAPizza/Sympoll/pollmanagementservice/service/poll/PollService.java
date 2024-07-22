@@ -22,7 +22,7 @@ import java.util.List;
 public class PollService {
     private final PollRepository pollRepository;
 
-    public Poll createPoll(PollCreateRequest pollCreateRequest) {
+    public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
                 .description(pollCreateRequest.description())
@@ -36,7 +36,7 @@ public class PollService {
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
-        return poll;
+        return poll.toPollResponse();
     }
 
 
@@ -79,23 +79,6 @@ public class PollService {
     public List<PollResponse> getAllPolls() {
         return pollRepository.findAll()
                 .stream()
-                .map(poll -> new PollResponse(
-                        poll.getPollId(),
-                        poll.getTitle(),
-                        poll.getDescription(),
-                        poll.getNumAnswersAllowed(),
-                        poll.getCreatorId(),
-                        poll.getGroupId(),
-                        poll.getTimeCreated(),
-                        poll.getTimeUpdated(),
-                        poll.getTimeEnds(),
-
-                        /* Convert Answers to answer responses */
-                        poll.getAnswersList().stream().map(answer -> new AnswerResponse(
-                                answer.getAnswerId(),
-                                answer.getAnswerOrdinal(),
-                                answer.getAnswerContent(),
-                                answer.getNumberOfVotes()
-                        )).toList())).toList();
+                .map(Poll::toPollResponse).toList();
     }
 }
