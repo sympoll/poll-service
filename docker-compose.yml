@@ -1,11 +1,12 @@
 version: '4'
 services:
   postgresql:
-    image: ghcr.io/sympoll/postgres-database/sympoll-db:29.04.2024
-    container_name: sympoll-db-container
+    image: postgres:16.2
+    container_name: sympoll-db-poll-test
     ports:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: 1
     volumes:
       - ./data:/data/db
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
