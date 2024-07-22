@@ -3,6 +3,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "polls")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Data
 public class Poll {
 
