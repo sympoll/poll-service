@@ -41,16 +41,17 @@ public class PollService {
 
 
     private List<Answer> convertAnswersToModel(List<String> answers) {
-        List<Answer> newAnswers = new ArrayList<>();
+        List<Answer> newAnswersList = new ArrayList<>();
+        int ord = 0;
         for (String answer : answers) {
-            int ord = 0;
             Answer newAnswer = new Answer();
             newAnswer.setAnswerContent(answer);
             newAnswer.setAnswerOrdinal(ord++);
             newAnswer.setNumberOfVotes(0);
+            newAnswersList.add(newAnswer);
         }
 
-        return newAnswers;
+        return newAnswersList;
     }
 
     private LocalDateTime convertToDate(String timeStamp) {

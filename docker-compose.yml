@@ -8,5 +8,5 @@ services:
     environment:
       POSTGRES_PASSWORD: 1
     volumes:
-      - ./data:/data/db
+      - ./data:/var/lib/postgresql/data
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
