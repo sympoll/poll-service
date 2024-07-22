@@ -22,7 +22,7 @@ import java.util.List;
 public class PollService {
     private final PollRepository pollRepository;
 
-    public Poll createPoll(PollCreateRequest pollCreateRequest) {
+    public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
                 .description(pollCreateRequest.description())
