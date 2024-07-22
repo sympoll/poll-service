@@ -5,4 +5,5 @@ public record AnswerResponse(
         int answerOrdinal,
         String answerContent,
         long numberOfVotes
-) { }
+) {
+}

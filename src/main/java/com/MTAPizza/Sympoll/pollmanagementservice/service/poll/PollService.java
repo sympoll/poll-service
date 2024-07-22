@@ -70,7 +70,8 @@ public class PollService {
                         poll.getTimeCreated(),
                         poll.getTimeUpdated(),
                         poll.getTimeEnds(),
-                        // Convert Answers to answer responses
+
+                        /* Convert Answers to answer responses */
                         poll.getAnswersList().stream().map(answer -> new AnswerResponse(
                                 answer.getAnswerId(),
                                 answer.getAnswerOrdinal(),
