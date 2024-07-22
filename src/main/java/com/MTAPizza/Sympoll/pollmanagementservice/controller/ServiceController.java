@@ -14,7 +14,6 @@ import java.util.List;
 @RequestMapping("/api/poll")
 @RequiredArgsConstructor
 public class ServiceController {
-
     private final PollService pollService;
 
     @PostMapping
@@ -28,6 +27,4 @@ public class ServiceController {
     public List<PollResponse> getAllPolls(){
         return pollService.getAllPolls();
     }
-
-
 }

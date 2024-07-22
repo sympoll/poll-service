@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,20 +22,29 @@ public class Poll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pollId;
 
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "num_answers_allowed")
     private int numAnswersAllowed;
+
+    @Column(name = "creator_id")
     private int creatorId;
+
+    @Column(name = "group_id")
     private int groupId;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeCreated;
+    @Column(name = "time_created")
+    private LocalDateTime timeCreated;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeUpdated;
+    @Column(name = "time_updated")
+    private LocalDateTime timeUpdated;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeEnds;
+    @Column(name = "time_ends")
+    private LocalDateTime timeEnds;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "poll_id")
