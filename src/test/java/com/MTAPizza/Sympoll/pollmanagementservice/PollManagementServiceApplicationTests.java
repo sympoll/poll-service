@@ -17,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PollManagementServiceApplicationTests {
 
+    /**
+    * Initialize postgres test container with the init script inside poll-management-service/test/resources
+    * */
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgreSQLContainer =
@@ -31,10 +34,17 @@ class PollManagementServiceApplicationTests {
         RestAssured.port = port;
     }
 
+    /**
+     * Run mock test container.
+     */
     static {
         postgreSQLContainer.start();
     }
 
+
+    /**
+     * Send request to create the specified poll.
+     */
     @Test
     void shouldCreatePoll() {
         String requestBody = """
@@ -44,8 +54,8 @@ class PollManagementServiceApplicationTests {
                   "numAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
-                  "timeCreated": "2024-07-22T10:00:00",
-                  "timeEnds": "2024-07-29T10:00:00",
+                  "timeCreated": "2024-07-22T10:00:00.000Z",
+                  "timeEnds": "2024-07-22T10:00:00.000Z",
                   "answers": [
                     "Java",
                     "Python",
@@ -54,7 +64,7 @@ class PollManagementServiceApplicationTests {
                   ]
                 }
                 """;
-
+        // Check that response is in fact 201
         Response response = RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
@@ -66,9 +76,9 @@ class PollManagementServiceApplicationTests {
 
         PollResponse pollResponse = response.as(PollResponse.class);
 
-        // Verify poll response
-        assertNotNull(pollResponse.pollId(), "Poll ID should not be null");
-        assertEquals("Favorite Programming Language", pollResponse.title());
-        assertEquals(4, pollResponse.answersList().size(), "Expected 4 answers in the response");
+        /* Verify poll response */
+        assertNotNull(pollResponse.pollId(), "Poll ID should not be null"); // Verify ID
+        assertEquals("Favorite Programming Language", pollResponse.title()); // Verify title
+        assertEquals(4, pollResponse.answersList().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
     }
 }
