@@ -1,60 +1,42 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
 
+@Entity
+@Table(name = "polls")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class Poll {
-    private final int pollNo;
-    private String pollQuestion;
-    private final String creatorUsername;
-    private final String groupID;
-    private final String votingID;
-    private final Date creationDate;
-    private Date votingDeadline;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int pollId;
+
+    private String title;
+    private String description;
+    private int numAnswersAllowed;
+    private int creatorId;
+    private int groupId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeCreated;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeUpdated;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeEnds;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "poll_id")
     private List<Answer> answersList;
 
-    public Poll(int pollNo, String pollQuestion, String creatorUsername, String groupID, String votingID, Date creationDate, Date votingDeadline, List<Answer> answersList) {
-        this.pollNo = pollNo;
-        this.pollQuestion = pollQuestion;
-        this.creatorUsername = creatorUsername;
-        this.groupID = groupID;
-        this.votingID = votingID;
-        this.creationDate = creationDate;
-        this.votingDeadline = votingDeadline;
-        this.answersList = answersList;
-    }
-
-    public int getPollNo() {
-        return pollNo;
-    }
-
-    public String getPollQuestion() {
-        return pollQuestion;
-    }
-
-    public String getCreatorUsername() {
-        return creatorUsername;
-    }
-
-    public String getGroupID() {
-        return groupID;
-    }
-
-    public String getVotingID() {
-        return votingID;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public Date getVotingDeadline() {
-        return votingDeadline;
-    }
-
-    public List<Answer> getAnswersList() {
-        return answersList;
-    }
 }
