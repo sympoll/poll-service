@@ -40,6 +40,12 @@ public class PollService {
     }
 
 
+    /**
+     * Converts a list of answer strings into a list of Answer entities.
+     *
+     * @param answers List of answer strings to be converted.
+     * @return List of Answer entities.
+     */
     private List<Answer> convertAnswersToModel(List<String> answers) {
         List<Answer> newAnswersList = new ArrayList<>();
         int ord = 0;
@@ -54,11 +60,22 @@ public class PollService {
         return newAnswersList;
     }
 
+    /**
+     * Converts a timestamp string to LocalDateTime.
+     *
+     * @param timeStamp The timestamp string in ISO-8601 format.
+     * @return LocalDateTime representation of the timestamp.
+     */
     private LocalDateTime convertToDate(String timeStamp) {
         Instant instant = Instant.parse(timeStamp);
         return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    /**
+     * Retrieves all polls from the repository and maps them to PollResponse DTOs.
+     *
+     * @return List of PollResponse DTOs containing details of all polls.
+     */
     public List<PollResponse> getAllPolls() {
         return pollRepository.findAll()
                 .stream()
