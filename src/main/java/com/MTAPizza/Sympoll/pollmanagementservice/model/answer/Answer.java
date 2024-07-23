@@ -22,5 +22,5 @@ public class Answer {
     private String answerContent;
 
     @Column(name = "num_of_votes")
-    private long numberOfVotes;
+    private int numberOfVotes;
 }

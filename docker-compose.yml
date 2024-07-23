@@ -7,6 +7,7 @@ services:
     ports:
       - "5432:5432"
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1
     volumes:
       - ./data:/var/lib/postgresql/data  # Maps the local directory ./data to the container’s data directory for data persistence.
