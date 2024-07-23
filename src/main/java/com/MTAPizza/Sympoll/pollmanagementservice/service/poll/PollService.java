@@ -1,6 +1,5 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.answer.AnswerResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
@@ -29,6 +28,7 @@ public class PollService {
                 .numAnswersAllowed(pollCreateRequest.numAnswersAllowed())
                 .creatorId(pollCreateRequest.creatorId())
                 .groupId(pollCreateRequest.groupId())
+                .deadline(convertToDate(pollCreateRequest.deadline()))
                 .answersList(convertAnswersToModel(pollCreateRequest.answers()))
                 .build();
 
@@ -78,5 +78,14 @@ public class PollService {
         return pollRepository.findAll()
                 .stream()
                 .map(Poll::toPollResponse).toList();
+    }
+
+    public int deletePoll(int pollId) {
+        pollRepository.deleteById(pollId);
+        return pollId;
+    }
+
+    public PollResponse getPollById(int pollId) {
+        return pollRepository.getReferenceById(pollId).toPollResponse();
     }
 }

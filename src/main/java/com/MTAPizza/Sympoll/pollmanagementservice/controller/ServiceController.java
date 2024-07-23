@@ -27,4 +27,17 @@ public class ServiceController {
     public List<PollResponse> getAllPolls(){
         return pollService.getAllPolls();
     }
+
+    @GetMapping("/id")
+    @ResponseStatus(HttpStatus.OK)
+    public PollResponse getPollById(@RequestParam int pollId){
+        return pollService.getPollById(pollId);
+    }
+
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public int deletePoll(@RequestParam int pollId){
+        return pollService.deletePoll(pollId);
+    }
 }

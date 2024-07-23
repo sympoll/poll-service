@@ -9,6 +9,6 @@ public record PollCreateRequest(
         int creatorId,
         int groupId,
         String timeCreated,
-        String timeEnds,
+        String deadline,
         List<String> answers) {
 }
