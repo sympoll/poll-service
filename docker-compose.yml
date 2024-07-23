@@ -1,0 +1,13 @@
+version: '4'
+
+services:
+  postgresql:
+    image: postgres:16.2
+    container_name: sympoll-db-poll-test
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: 1
+    volumes:
+      - ./data:/var/lib/postgresql/data  # Maps the local directory ./data to the container’s data directory for data persistence.
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql  # Maps the local SQL file ./docker/init.sql to the container’s initialization directory to run when the container starts.
