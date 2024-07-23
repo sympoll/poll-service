@@ -30,7 +30,7 @@ public class ServiceController {
 
     @GetMapping("/id")
     @ResponseStatus(HttpStatus.OK)
-    public PollResponse getAllPolls(@RequestParam int pollId){
+    public PollResponse getPollById(@RequestParam int pollId){
         return pollService.getPollById(pollId);
     }
 
