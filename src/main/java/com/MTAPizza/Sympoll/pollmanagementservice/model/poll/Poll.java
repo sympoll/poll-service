@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "polls")
@@ -21,8 +22,8 @@ import java.util.List;
 public class Poll {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int pollId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID pollId;
 
     @Column(name = "title")
     private String title;

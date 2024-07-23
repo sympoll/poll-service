@@ -1,7 +1,7 @@
 -- Poll Management Service Schema
 CREATE TABLE polls
 (
-    poll_id             SERIAL PRIMARY KEY,
+    poll_id             UUID PRIMARY KEY,
     title               VARCHAR(255),
     description         TEXT,
     num_answers_allowed INT,
@@ -15,7 +15,7 @@ CREATE TABLE polls
 CREATE TABLE answer_options
 (
     answer_id    SERIAL PRIMARY KEY,
-    poll_id      INT REFERENCES polls (poll_id),
+    poll_id      UUID REFERENCES polls (poll_id),
     ordinal      INT,
     answer_text  TEXT,
     num_of_votes INT

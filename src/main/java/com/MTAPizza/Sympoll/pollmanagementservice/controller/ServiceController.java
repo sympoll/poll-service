@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/poll")
@@ -30,14 +31,14 @@ public class ServiceController {
 
     @GetMapping("/id")
     @ResponseStatus(HttpStatus.OK)
-    public PollResponse getPollById(@RequestParam int pollId){
+    public PollResponse getPollById(@RequestParam UUID pollId){
         return pollService.getPollById(pollId);
     }
 
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public int deletePoll(@RequestParam int pollId){
+    public UUID deletePoll(@RequestParam UUID pollId){
         return pollService.deletePoll(pollId);
     }
 }

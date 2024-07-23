@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -80,12 +81,12 @@ public class PollService {
                 .map(Poll::toPollResponse).toList();
     }
 
-    public int deletePoll(int pollId) {
+    public UUID deletePoll(UUID pollId) {
         pollRepository.deleteById(pollId);
         return pollId;
     }
 
-    public PollResponse getPollById(int pollId) {
+    public PollResponse getPollById(UUID pollId) {
         return pollRepository.getReferenceById(pollId).toPollResponse();
     }
 }

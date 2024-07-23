@@ -13,6 +13,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PollManagementServiceApplicationTests {
-    private static int pollId;
+    private static UUID pollId;
 
     /**
     * Initialize postgres test container with the init script inside poll-management-service/test/resources
@@ -169,7 +170,7 @@ class PollManagementServiceApplicationTests {
                 .statusCode(200)
                 .extract().response();
 
-        int pollIdResponse = responseDelete.as(Integer.class);
+        UUID pollIdResponse = responseDelete.as(UUID.class);
 
         // Check that response is in fact 200
         Response responseAll = RestAssured.given()
@@ -182,7 +183,7 @@ class PollManagementServiceApplicationTests {
 
         List<PollResponse> pollResponses = responseAll.as(new TypeRef<List<PollResponse>>() {});
         /* Verify poll response */
-        assertEquals(1, pollIdResponse, "Poll ID should be 1");
+        assertNotNull(pollIdResponse, "Poll ID should not be null");
         assertEquals(1, pollResponses.size(), "Expected 1 Polls in the response");
     }
 }

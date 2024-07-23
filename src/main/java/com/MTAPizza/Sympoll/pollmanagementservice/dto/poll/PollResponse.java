@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record PollResponse(
-        int pollId,
+        UUID pollId,
         String title,
         String description,
         int numAnswersAllowed,
