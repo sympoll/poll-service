@@ -84,4 +84,8 @@ public class PollService {
         pollRepository.deleteById(pollId);
         return pollId;
     }
+
+    public PollResponse getPollById(int pollId) {
+        return pollRepository.getReferenceById(pollId).toPollResponse();
+    }
 }
