@@ -27,4 +27,10 @@ public class ServiceController {
     public List<PollResponse> getAllPolls(){
         return pollService.getAllPolls();
     }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public int deletePoll(@RequestParam int pollId){
+        return pollService.deletePoll(pollId);
+    }
 }

@@ -79,4 +79,9 @@ public class PollService {
                 .stream()
                 .map(Poll::toPollResponse).toList();
     }
+
+    public int deletePoll(int pollId) {
+        pollRepository.deleteById(pollId);
+        return pollId;
+    }
 }
