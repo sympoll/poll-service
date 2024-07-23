@@ -61,7 +61,7 @@ class PollManagementServiceApplicationTests {
                   "numAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
-                  "timeEnds": "2024-07-22T10:00:00.000Z",
+                  "deadline": "2024-07-22T10:00:00.000Z",
                   "answers": [
                     "Java",
                     "Python",
@@ -86,7 +86,7 @@ class PollManagementServiceApplicationTests {
                   "numAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
-                  "timeEnds": "2024-07-22T10:00:00.000Z",
+                  "deadline": "2024-07-22T10:00:00.000Z",
                   "answers": [
                     "Bentz Brothers",
                     "Gourmet 26",
@@ -102,7 +102,7 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertNotNull(pollResponseBurger.pollId(), "Poll ID should not be null"); // Verify ID
         assertEquals("Favorite burger in Tel Aviv", pollResponseBurger.title()); // Verify title
-        assertEquals(4, pollResponseBurger.answersList().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
+        assertEquals(5, pollResponseBurger.answersList().size(), "Expected 5 answers in the response"); // Verify 4 answers were created
 
     }
 
