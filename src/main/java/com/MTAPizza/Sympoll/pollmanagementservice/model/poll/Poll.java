@@ -40,10 +40,10 @@ public class Poll {
     private int groupId;
 
     @Column(name = "time_created")
-    private LocalDateTime timeCreated;
+    private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.
 
     @Column(name = "time_updated")
-    private LocalDateTime timeUpdated;
+    private LocalDateTime timeUpdated; // NOTE: the last time the poll was updated, can be ignored for now.
 
     @Column(name = "time_ends")
     private LocalDateTime timeEnds;
@@ -51,7 +51,6 @@ public class Poll {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "poll_id")
     private List<Answer> answersList;
-
 
     /**
      * @return A PollResponse representation if this poll
