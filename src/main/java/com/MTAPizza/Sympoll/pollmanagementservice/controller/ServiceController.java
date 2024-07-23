@@ -41,4 +41,10 @@ public class ServiceController {
     public UUID deletePoll(@RequestParam UUID pollId){
         return pollService.deletePoll(pollId);
     }
+
+    @GetMapping("/health")
+    @ResponseStatus(HttpStatus.OK)
+    public String HealthCheck(){
+        return "OK";
+    }
 }
