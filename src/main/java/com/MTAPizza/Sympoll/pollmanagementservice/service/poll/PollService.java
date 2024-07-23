@@ -29,6 +29,7 @@ public class PollService {
                 .numAnswersAllowed(pollCreateRequest.numAnswersAllowed())
                 .creatorId(pollCreateRequest.creatorId())
                 .groupId(pollCreateRequest.groupId())
+                .deadline(convertToDate(pollCreateRequest.timeEnds()))
                 .answersList(convertAnswersToModel(pollCreateRequest.answers()))
                 .build();
 
