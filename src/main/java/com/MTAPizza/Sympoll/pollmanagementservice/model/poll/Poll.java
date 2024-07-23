@@ -46,8 +46,8 @@ public class Poll {
     @Column(name = "time_updated")
     private LocalDateTime timeUpdated; // NOTE: the last time the poll was updated, can be ignored for now.
 
-    @Column(name = "time_ends")
-    private LocalDateTime timeEnds;
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "poll_id")
@@ -66,7 +66,7 @@ public class Poll {
                 this.getGroupId(),
                 this.getTimeCreated(),
                 this.getTimeUpdated(),
-                this.getTimeEnds(),
+                this.getDeadline(),
 
                 /* Convert Answers to answer responses */
                 this.getAnswersList().stream().map(answer -> new AnswerResponse(

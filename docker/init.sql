@@ -9,7 +9,7 @@ CREATE TABLE polls
     group_id            INT,
     time_created        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_updated        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    time_ends           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    deadline           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE answer_options
