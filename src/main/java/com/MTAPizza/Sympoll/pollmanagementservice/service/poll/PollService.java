@@ -5,6 +5,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
+import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class PollService {
                 .answersList(convertAnswersToModel(pollCreateRequest.answers()))
                 .build();
 
+        Validator.validateNewPoll(poll);
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
         return poll.toPollResponse();
