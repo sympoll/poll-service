@@ -62,7 +62,7 @@ class PollManagementServiceApplicationTests {
                   "numAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
-                  "deadline": "2024-07-22T10:00:00.000Z",
+                  "deadline": "2024-12-22T10:00:00.000Z",
                   "answers": [
                     "Java",
                     "Python",
@@ -87,7 +87,7 @@ class PollManagementServiceApplicationTests {
                   "numAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
-                  "deadline": "2024-07-22T10:00:00.000Z",
+                  "deadline": "2024-12-22T10:00:00.000Z",
                   "answers": [
                     "Bentz Brothers",
                     "Gourmet 26",
