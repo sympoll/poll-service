@@ -17,7 +17,7 @@ public class Validator {
 
     private static void validateAllowedAnswers(int numOfAnswers, int numOfAllowedAnswers) {
         if (numOfAllowedAnswers > numOfAnswers) {
-            throw new IllegalArgumentException("Number of allowed answers is greater than number of allowed answers");
+            throw new IllegalArgumentException("Number of allowed answers is greater than number of optional answers");
         }
     }
 
