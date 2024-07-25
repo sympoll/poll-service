@@ -76,44 +76,4 @@ public class Poll {
                         answer.getNumberOfVotes()
                 )).toList());
     }
-
-    public List<Answer> getAnswersList() {
-        return answersList;
-    }
-
-    public int getCreatorId() {
-        return creatorId;
-    }
-
-    public LocalDateTime getDeadline() {
-        return deadline;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public int getNumAnswersAllowed() {
-        return numAnswersAllowed;
-    }
-
-    public UUID getPollId() {
-        return pollId;
-    }
-
-    public LocalDateTime getTimeCreated() {
-        return timeCreated;
-    }
-
-    public LocalDateTime getTimeUpdated() {
-        return timeUpdated;
-    }
-
-    public String getTitle() {
-        return title;
-    }
 }
