@@ -86,7 +86,7 @@ class PollManagementServiceApplicationTests {
                 }
                 """;
 
-        PollResponse pollResponseProg = tryToCreatePoll(requestBodyProg, HttpStatus.CREATED).as(PollResponse.class);
+        PollResponse pollResponseProg = tryToCreatePollAndAssertStatusCode(requestBodyProg, HttpStatus.CREATED).as(PollResponse.class);
 
         /* Verify poll response */
         assertNotNull(pollResponseProg.pollId(), "Poll ID should not be null"); // Verify ID
@@ -112,7 +112,7 @@ class PollManagementServiceApplicationTests {
                 }
                 """;
 
-        PollResponse pollResponseBurger = tryToCreatePoll(requestBodyBurger, HttpStatus.CREATED).as(PollResponse.class);
+        PollResponse pollResponseBurger = tryToCreatePollAndAssertStatusCode(requestBodyBurger, HttpStatus.CREATED).as(PollResponse.class);
 
         /* Verify poll response */
         assertNotNull(pollResponseBurger.pollId(), "Poll ID should not be null"); // Verify ID
@@ -126,7 +126,7 @@ class PollManagementServiceApplicationTests {
      * The expectedStatus is the status that the request is expected to return based on the body provided.
      * Returns the service's response.
      */
-    Response tryToCreatePoll(String requestBody, HttpStatus expectedStatus){
+    Response tryToCreatePollAndAssertStatusCode(String requestBody, HttpStatus expectedStatus){
         // Check that response is in fact 201
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -233,7 +233,7 @@ class PollManagementServiceApplicationTests {
         );
 
         // Perform the POST request with the invalid request body
-        Response response = tryToCreatePoll(gson.toJson(request), HttpStatus.BAD_REQUEST);
+        Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
         IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
@@ -257,7 +257,7 @@ class PollManagementServiceApplicationTests {
         );
 
         // Perform the POST request with the invalid request body
-        Response response = tryToCreatePoll(gson.toJson(request), HttpStatus.BAD_REQUEST);
+        Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
         IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
@@ -289,7 +289,7 @@ class PollManagementServiceApplicationTests {
                 """;
 
         // Perform the POST request with the invalid request body
-        Response response = tryToCreatePoll(requestBody, HttpStatus.BAD_REQUEST);
+        Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
 
         // Verify the response code
         IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
