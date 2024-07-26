@@ -1,28 +1,43 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
+import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
+
     private static UUID pollId;
+
+    private static DateTimeFormatter formatter;
 
     /**
     * Initialize postgres test container with the init script inside poll-management-service/test/resources
@@ -46,6 +61,7 @@ class PollManagementServiceApplicationTests {
      */
     static {
         postgreSQLContainer.start();
+        formatter = DateTimeFormatter.ISO_DATE_TIME;
     }
 
 
@@ -185,5 +201,35 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertNotNull(pollIdResponse, "Poll ID should not be null");
         assertEquals(1, pollResponses.size(), "Expected 1 Polls in the response");
+    }
+
+    @Test
+    @Order(5)
+    void shouldNotCreatePoll() {
+        PollCreateRequest request = new PollCreateRequest(
+                "Favorite Programming Language",
+                "Vote for your favorite programming language",
+                1,
+                123,
+                456,
+                LocalDateTime.now().format(formatter),
+                "2023-01-01T10:00:00.000Z", // Invalid deadline
+                List.of("Java", "Python", "C++", "JavaScript")
+        );
+
+        // Perform the POST request with the invalid request body
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(request)
+                .when()
+                .post("/api/poll")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().response();
+
+        // Verify the response body
+        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        assertNotNull(errorResponse, "Error response should not be null");
+        assertEquals("A deadline cannot be earlier than the time a poll was created", errorResponse.message());
     }
 }

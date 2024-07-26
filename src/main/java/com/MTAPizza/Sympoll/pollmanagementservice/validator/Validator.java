@@ -17,13 +17,13 @@ public class Validator {
 
     private static void validateAllowedAnswers(int numOfAnswers, int numOfAllowedAnswers) {
         if (numOfAllowedAnswers > numOfAnswers) {
-            throw new IllegalArgumentException("Number of allowed answers is greater than number of optional answers");
+            throw new IllegalArgumentException("Number of allowed answers is greater than number of available answers");
         }
     }
 
     private static void validateDeadline(LocalDateTime timeCreated, LocalDateTime deadline){
         if (deadline.isBefore(timeCreated)) {
-            throw new IllegalArgumentException("Deadline is greater than time created");
+            throw new IllegalArgumentException("A deadline cannot be earlier than the time a poll was created");
         }
     }
 }
