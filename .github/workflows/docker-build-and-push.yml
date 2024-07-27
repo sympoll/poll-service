@@ -38,3 +38,5 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/sympoll-poll-service:${{ steps.date.outputs.DATE }}
+            ghcr.io/${{ github.repository }}/sympoll-poll-service:latest
+
