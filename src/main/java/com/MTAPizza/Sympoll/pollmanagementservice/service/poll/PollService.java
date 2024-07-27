@@ -85,6 +85,7 @@ public class PollService {
 
     public UUID deletePoll(UUID pollId) {
         pollRepository.deleteById(pollId);
+        log.info("POLL: {} was deleted.", pollId);
         return pollId;
     }
 
