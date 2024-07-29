@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
@@ -44,7 +45,7 @@ public class ServiceController {
 
     @GetMapping("/health")
     @ResponseStatus(HttpStatus.OK)
-    public String HealthCheck(){
-        return "OK";
+    public HealthResponse HealthCheck(){
+        return new HealthResponse("Running", "Poll Management Service is up and running.");
     }
 }
