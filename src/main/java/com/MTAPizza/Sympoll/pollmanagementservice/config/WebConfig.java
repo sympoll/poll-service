@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
         // Applies CORS configuration to all endpoints in the application.
         registry.addMapping("/**")
                 // Allows requests from the specified origin. Change this to the actual domain of your frontend application.
-                .allowedOrigins("http://localhost:8080")
+                .allowedOrigins("http://backend.default.svc.cluster.local:8081")
                 // Specifies the allowed HTTP methods for CORS requests.
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 // Allows all headers to be included in the requests.
