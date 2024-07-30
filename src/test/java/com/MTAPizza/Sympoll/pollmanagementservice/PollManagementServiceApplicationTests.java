@@ -32,9 +32,9 @@ class PollManagementServiceApplicationTests {
 
     private static UUID pollId;
 
-    private static DateTimeFormatter formatter;
+    private static final DateTimeFormatter formatter;
 
-    private static Gson gson;
+    private static final Gson gson;
 
     /**
     * Initialize postgres test container with the init script inside poll-management-service/test/resources
@@ -53,11 +53,8 @@ class PollManagementServiceApplicationTests {
         RestAssured.port = port;
     }
 
-    /**
-     * Run mock test container.
-     */
     static {
-        postgreSQLContainer.start();
+        postgreSQLContainer.start(); //  Run mock test container.
         formatter = DateTimeFormatter.ISO_DATE_TIME;
         gson = new Gson();
     }
@@ -93,7 +90,6 @@ class PollManagementServiceApplicationTests {
         assertEquals("Favorite Programming Language", pollResponseProg.title()); // Verify title
         assertEquals(4, pollResponseProg.answersList().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
 
-
         String requestBodyBurger = """
                 {
                   "title": "Favorite burger in Tel Aviv",
@@ -103,7 +99,7 @@ class PollManagementServiceApplicationTests {
                   "groupId": 456,
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "answers": [
-                    "Bentz Brothers",
+                    "Benz Brothers",
                     "Gourmet 26",
                     "Vitrina",
                     "Port 19",
@@ -121,6 +117,7 @@ class PollManagementServiceApplicationTests {
 
     }
 
+
     /**
      * Send a request to the poll service to create a poll with the given properties in the request body.
      * The expectedStatus is the status that the request is expected to return based on the body provided.
@@ -128,7 +125,7 @@ class PollManagementServiceApplicationTests {
      */
     Response tryToCreatePollAndAssertStatusCode(String requestBody, HttpStatus expectedStatus){
         // Check that response is in fact 201
-        Response response = RestAssured.given()
+        return RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
                 .when()
@@ -136,9 +133,8 @@ class PollManagementServiceApplicationTests {
                 .then()
                 .statusCode(expectedStatus.value())
                 .extract().response();
-
-        return response;
     }
+
 
     @Test
     @Order(2)
@@ -152,11 +148,12 @@ class PollManagementServiceApplicationTests {
                 .statusCode(200)
                 .extract().response();
 
-        List<PollResponse> pollResponses = response.as(new TypeRef<List<PollResponse>>() {});
+        List<PollResponse> pollResponses = response.as(new TypeRef<>() {});
         /* Verify poll response */
         assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
         pollId = pollResponses.get(0).pollId();
     }
+
 
     @Test
     @Order(3)
@@ -175,6 +172,7 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertNotNull(pollResponse.pollId(), "Poll ID should not be null");
     }
+
 
     @Test
     @Order(4)
@@ -200,11 +198,12 @@ class PollManagementServiceApplicationTests {
                 .statusCode(200)
                 .extract().response();
 
-        List<PollResponse> pollResponses = responseAll.as(new TypeRef<List<PollResponse>>() {});
+        List<PollResponse> pollResponses = responseAll.as(new TypeRef<>() {});
         /* Verify poll response */
         assertNotNull(pollIdResponse, "Poll ID should not be null");
         assertEquals(1, pollResponses.size(), "Expected 1 Polls in the response");
     }
+
 
     /**
      * This should try to create polls and each of these functions should not succeed.
@@ -216,6 +215,7 @@ class PollManagementServiceApplicationTests {
         tryToCreatePollWithInvalidDate();
         tryToCreatePollWithInvalidAnswersAllowed();
     }
+
 
     /**
      * Test if to see that the system can detect if the user gave an earlier deadline than the poll's creation time.
@@ -241,6 +241,7 @@ class PollManagementServiceApplicationTests {
         assertEquals("A deadline cannot be earlier than the time a poll was created", errorResponse.message());
     }
 
+
     /**
      * Test to see if the system can detect that the user gave the option to select more answers than the actual number of answers provided.
      */
@@ -265,6 +266,7 @@ class PollManagementServiceApplicationTests {
         assertEquals("Number of allowed answers is greater than number of available answers", errorResponse.message());
     }
 
+
     /**
      * Test if the system can handle a request to create a poll with a query parameter that doesn't exist ("Field").
      */
@@ -279,7 +281,7 @@ class PollManagementServiceApplicationTests {
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "Field": "value"
                   "answers": [
-                    "Bentz Brothers",
+                    "Benz Brothers",
                     "Gourmet 26",
                     "Vitrina",
                     "Port 19",
