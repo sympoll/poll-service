@@ -36,7 +36,7 @@ jobs:
         run: mvn clean install -T 4 # Build with 4 threads
 
       - name: Run unit tests
-        run: mvn test -Dtest=FastTests  # Run fast tests first
+        run: mvn test
 
 
       - name: Upload test results
