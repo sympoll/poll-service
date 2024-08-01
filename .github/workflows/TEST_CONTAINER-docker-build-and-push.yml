@@ -2,6 +2,9 @@ name: TEST CONTAINER - Build and push Docker test image to Github packages
 on:
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/sympoll-poll-service-test
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -40,7 +43,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository }}/sympoll-poll-service-test:${{ steps.date.outputs.DATE }}
-            ghcr.io/${{ github.repository }}/sympoll-poll-service-test:latest
+            ${{ env.IMAGE_NAME }}:${{ steps.date.outputs.DATE }}
+            ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha,key=${{ runner.os }}-build-${{ github.sha }}  # Use cached layers based on commit SHA
 
