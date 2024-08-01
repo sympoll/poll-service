@@ -143,7 +143,7 @@ class PollManagementServiceApplicationTests {
         Response response = RestAssured.given()
                 .contentType("application/json")
                 .when()
-                .get("/api/poll/fetch-all")
+                .get("/api/poll/all")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -163,7 +163,7 @@ class PollManagementServiceApplicationTests {
                 .queryParam("pollId", pollId)
                 .contentType("application/json")
                 .when()
-                .get("/api/poll/fetch-by-poll-id")
+                .get("/api/poll/by-poll-id")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -182,7 +182,7 @@ class PollManagementServiceApplicationTests {
                 .queryParam("pollId", pollId)
                 .contentType("application/json")
                 .when()
-                .delete("/api/poll")
+                .delete("/api/poll/by-poll-id")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -193,7 +193,7 @@ class PollManagementServiceApplicationTests {
         Response responseAll = RestAssured.given()
                 .contentType("application/json")
                 .when()
-                .get("/api/poll")
+                .get("/api/poll/all")
                 .then()
                 .statusCode(200)
                 .extract().response();
