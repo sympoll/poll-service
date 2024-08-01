@@ -30,6 +30,14 @@ jobs:
         id: date
         run: echo "::set-output name=DATE::$(date +'%d.%m.%Y')"
 
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: ~/.docker/builder
+          key: ${{ runner.os }}-build-${{ github.sha }}  # Cache key based on OS and commit SHA
+          restore-keys: |   # Check for existing cache based on previous builds with same OS and SHA
+            ${{ runner.os }}-build-
+
       - name: Build and push Docker image
         id: docker_build
         uses: docker/build-push-action@v2
@@ -41,4 +49,5 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/sympoll-poll-service:${{ steps.date.outputs.DATE }}
             ghcr.io/${{ github.repository }}/sympoll-poll-service:latest
+          cache-from: type=gha,key=${{ runner.os }}-build-${{ github.sha }}  # Use cached layers based on commit SHA
 

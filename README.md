@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Poll Management Service is a RESTful API for creating, retrieving, and deleting polls. It operates on port `8081` by default.
+The Poll Management Service is a RESTful API for creating, retrieving, and deleting polls. It operates on port `8082` by default.
 
 ## Base URL
 
-http://localhost:8081/api/poll
+http://localhost:8082/api/poll
 
 ## Endpoints
 
