@@ -1,4 +1,4 @@
-package com.MTAPizza.Sympoll.pollmanagementservice.model.answer;
+package com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,17 +10,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Answer {
+public class VotingItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int answerId;
+    private int votingItemId;
 
     @Column(name = "ordinal")
-    private int answerOrdinal;
+    private int votingItemOrdinal;
 
     @Column(name = "answer_text")
-    private String answerContent;
+    private String description;
 
     @Column(name = "num_of_votes")
-    private int numberOfVotes;
+    private int voteCount;
 }

@@ -70,11 +70,11 @@ class PollManagementServiceApplicationTests {
                 {
                   "title": "Favorite Programming Language",
                   "description": "Vote for your favorite programming language",
-                  "numAnswersAllowed": 1,
+                  "nofAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
                   "deadline": "2024-12-22T10:00:00.000Z",
-                  "answers": [
+                  "votingItems": [
                     "Java",
                     "Python",
                     "C++",
@@ -88,17 +88,17 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertNotNull(pollResponseProg.pollId(), "Poll ID should not be null"); // Verify ID
         assertEquals("Favorite Programming Language", pollResponseProg.title()); // Verify title
-        assertEquals(4, pollResponseProg.answersList().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
+        assertEquals(4, pollResponseProg.votingItems().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
 
         String requestBodyBurger = """
                 {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
-                  "numAnswersAllowed": 1,
+                  "nofAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
                   "deadline": "2024-12-22T10:00:00.000Z",
-                  "answers": [
+                  "votingItems": [
                     "Benz Brothers",
                     "Gourmet 26",
                     "Vitrina",
@@ -113,7 +113,7 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertNotNull(pollResponseBurger.pollId(), "Poll ID should not be null"); // Verify ID
         assertEquals("Favorite burger in Tel Aviv", pollResponseBurger.title()); // Verify title
-        assertEquals(5, pollResponseBurger.answersList().size(), "Expected 5 answers in the response"); // Verify 4 answers were created
+        assertEquals(5, pollResponseBurger.votingItems().size(), "Expected 5 answers in the response"); // Verify 4 answers were created
 
     }
 
@@ -143,7 +143,7 @@ class PollManagementServiceApplicationTests {
         Response response = RestAssured.given()
                 .contentType("application/json")
                 .when()
-                .get("/api/poll")
+                .get("/api/poll/fetch-all")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -163,7 +163,7 @@ class PollManagementServiceApplicationTests {
                 .queryParam("pollId", pollId)
                 .contentType("application/json")
                 .when()
-                .get("/api/poll/id")
+                .get("/api/poll/fetch-by-poll-id")
                 .then()
                 .statusCode(200)
                 .extract().response();
@@ -275,12 +275,12 @@ class PollManagementServiceApplicationTests {
                 {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
-                  "numAnswersAllowed": 1,
+                  "nofAnswersAllowed": 1,
                   "creatorId": 123,
                   "groupId": 456,
                   "deadline": "2024-12-22T10:00:00.000Z",
-                  "Field": "value"
-                  "answers": [
+                  "invalidField": "value"
+                  "votingItems": [
                     "Benz Brothers",
                     "Gourmet 26",
                     "Vitrina",
@@ -297,6 +297,4 @@ class PollManagementServiceApplicationTests {
         IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
     }
-
-
 }
