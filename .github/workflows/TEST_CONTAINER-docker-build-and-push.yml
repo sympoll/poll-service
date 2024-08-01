@@ -1,13 +1,9 @@
-name: Build and push Docker image to Github packages
+name: TEST CONTAINER - Build and push Docker test image to Github packages
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "**/README.md"
-      - ".github/workflows/**"
-      - "**/.gitignore"
   workflow_dispatch:
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/sympoll-poll-service-test
 
 jobs:
   build-and-push:
@@ -30,6 +26,14 @@ jobs:
         id: date
         run: echo "::set-output name=DATE::$(date +'%d.%m.%Y')"
 
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: ~/.docker/builder
+          key: ${{ runner.os }}-build-${{ github.sha }}  # Cache key based on OS and commit SHA
+          restore-keys: |   # Check for existing cache based on previous builds with same OS and SHA
+            ${{ runner.os }}-build-
+
       - name: Build and push Docker image
         id: docker_build
         uses: docker/build-push-action@v2
@@ -39,6 +43,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository }}/sympoll-poll-service:${{ steps.date.outputs.DATE }}
-            ghcr.io/${{ github.repository }}/sympoll-poll-service:latest
-
+            ${{ env.IMAGE_NAME }}:${{ steps.date.outputs.DATE }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha,key=${{ runner.os }}-build-${{ github.sha }}  # Use cached layers based on commit SHA
+          cache-to: type=gha,mode=max  # Enable caching to GitHub Actions
