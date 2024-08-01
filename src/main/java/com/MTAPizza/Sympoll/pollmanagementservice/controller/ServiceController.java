@@ -28,14 +28,14 @@ public class ServiceController {
         return pollService.createPoll(pollCreateRequest);
     }
 
-    @GetMapping("/fetch-all")
+    @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public List<PollResponse> getAllPolls(){
         log.info("Received request to retrieve all polls");
         return pollService.getAllPolls();
     }
 
-    @GetMapping("/fetch-by-poll-id")
+    @GetMapping("/by-poll-id")
     @ResponseStatus(HttpStatus.OK)
     public PollResponse getPollById(@RequestParam UUID pollId){
         log.info("Received request to get poll by id: {}", pollId);
@@ -44,7 +44,7 @@ public class ServiceController {
     }
 
 
-    @DeleteMapping
+    @DeleteMapping("/by-poll-id")
     @ResponseStatus(HttpStatus.OK)
     public UUID deletePoll(@RequestParam UUID pollId){
         log.info("Received request to delete poll with id {}", pollId);
