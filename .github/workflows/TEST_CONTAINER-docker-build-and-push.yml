@@ -46,4 +46,4 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ steps.date.outputs.DATE }}
             ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha,key=${{ runner.os }}-build-${{ github.sha }}  # Use cached layers based on commit SHA
-
+          cache-to: type=gha,mode=max  # Enable caching to GitHub Actions
