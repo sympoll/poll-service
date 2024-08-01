@@ -28,14 +28,14 @@ public class ServiceController {
         return pollService.createPoll(pollCreateRequest);
     }
 
-    @GetMapping
+    @GetMapping("/fetch-all")
     @ResponseStatus(HttpStatus.OK)
     public List<PollResponse> getAllPolls(){
         log.info("Received request to retrieve all polls");
         return pollService.getAllPolls();
     }
 
-    @GetMapping("/id")
+    @GetMapping("/fetch-by-poll-id")
     @ResponseStatus(HttpStatus.OK)
     public PollResponse getPollById(@RequestParam UUID pollId){
         log.info("Received request to get poll by id: {}", pollId);
