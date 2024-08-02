@@ -2,94 +2,112 @@
 
 ## Overview
 
-The Poll Management Service is a RESTful API for creating, retrieving, and deleting polls. It operates on port `8082` by default.
+The Poll Management Service is a RESTful API for creating, retrieving, and deleting polls.
 
-## Base URL
+<br />   
+   
+## Base URL (for local testing)
 
-http://localhost:8082/api/poll
+http://localhost
+
+<br />   
 
 ## Endpoints
 
 ### Create a Poll
 
-- **URL:** `/`
+- **Endpoint:** `/api/poll`
 - **Method:** `POST`
 - **Description:** Creates a new poll.
-- **Request Body:**
+- **Request Body:**   
+
+
     ```json
     {
         "title": "string",
         "description": "string",
-        "numAnswersAllowed": 0,
+        "nofAnswersAllowed": 0
         "creatorId": "string",
         "groupId": "string",
         "deadline": "2024-07-27T00:00:00Z",
-        "answers": [
+        "votingItems": [
+            "string",
+            "string",
             "string"
         ]
     }
     ```
-- **Response:**
+    - constraints:   
+            `nofAnswersAllowed` - a number between 0 and the number of voting options.   
+            `deadline` - a time in the future.
+   
+- **Response:**   
+  
     ```json
     {
         "pollId": "uuid",
         "title": "string",
         "description": "string",
-        "numAnswersAllowed": 0,
+        "nofAnswersAllowed": 0,
         "creatorId": "string",
         "groupId": "string",
         "timeCreated": "2024-07-27T00:00:00Z",
         "timeUpdated": "2024-07-27T00:00:00Z",
-        "timeEnds": "2024-07-27T00:00:00Z",
-        "answers": [
+        "deadline": "2024-07-27T00:00:00Z",
+        "votingItems": [
             {
-                "answerId": "uuid",
-                "answerContent": "string",
-                "answerOrdinal": 0,
-                "numberOfVotes": 0
+                "votingItemId": "uuid",
+                "votingItemOrdinal": 0,
+                "description": "string",
+                "voteCount": 0
             }
         ]
     }
     ```
-- **Responses:**
+- **Response HTTP Status:**
+    - `200 OK` - Successfully completed request.
     - `201 Created` – Poll created successfully.
     - `400 Bad Request` – Invalid input data.
 
+<br />   
+
 ### Get All Polls
 
-- **URL:** `/`
+- **Endpoint:** `/api/poll/all`
 - **Method:** `GET`
 - **Description:** Retrieves a list of all polls.
-- **Response:**
+- **Response HTTP Status:**
     ```json
     [
         {
             "pollId": "uuid",
             "title": "string",
             "description": "string",
-            "numAnswersAllowed": 0,
+            "nofAnswersAllowed": 0,
             "creatorId": "string",
             "groupId": "string",
             "timeCreated": "2024-07-27T00:00:00Z",
             "timeUpdated": "2024-07-27T00:00:00Z",
-            "timeEnds": "2024-07-27T00:00:00Z",
-            "answers": [
+            "deadline": "2024-07-27T00:00:00Z",
+            "votingItems": [
                 {
-                    "answerId": "uuid",
-                    "answerContent": "string",
-                    "answerOrdinal": 0,
-                    "numberOfVotes": 0
+                    "votingItemId": "uuid",
+                    "votingItemOrdinal": 0,
+                    "description": "string",
+                    "voteCount": 0
                 }
             ]
         }
     ]
     ```
-- **Responses:**
+- **Response HTTP Status:**
     - `200 OK` – List of polls successfully retrieved.
+
+<br />   
 
 ### Get Poll by ID
 
-- **URL:** `/id`
+- **Endpoint:** `/api/poll/by-id`
 - **Method:** `GET`
 - **Description:** Retrieves a specific poll by its ID.
 - **Query Parameters:**
@@ -100,29 +118,32 @@ http://localhost:8082/api/poll
         "pollId": "uuid",
         "title": "string",
         "description": "string",
-        "numAnswersAllowed": 0,
+        "nofAnswersAllowed": 0,
         "creatorId": "string",
         "groupId": "string",
         "timeCreated": "2024-07-27T00:00:00Z",
         "timeUpdated": "2024-07-27T00:00:00Z",
-        "timeEnds": "2024-07-27T00:00:00Z",
-        "answers": [
+        "deadline": "2024-07-27T00:00:00Z",
+        "votingItems": [
             {
-                "answerId": "uuid",
-                "answerContent": "string",
-                "answerOrdinal": 0,
-                "numberOfVotes": 0
+                "votingItemId": "uuid",
+                "votingItemOrdinal": 0,
+                "description": "string",
+                "voteCount": 0
             }
         ]
     }
     ```
-- **Responses:**
+- **Response HTTP Status:**
     - `200 OK` – Poll successfully retrieved.
     - `404 Not Found` – Poll with the specified ID not found.
 
+
+<br />   
+
 ### Delete a Poll
 
-- **URL:** `/`
+- **Endpoint:** `/api/poll`
 - **Method:** `DELETE`
 - **Description:** Deletes a specific poll by its ID.
 - **Query Parameters:**
@@ -133,27 +154,35 @@ http://localhost:8082/api/poll
         "pollId": "uuid"
     }
     ```
-- **Responses:**
+- **Response HTTP Status:**
     - `200 OK` – Poll successfully deleted.
     - `404 Not Found` – Poll with the specified ID not found.
 
+<br />   
+   
 ### Health Check
 
-- **URL:** `/health`
+- **URL:** `api/poll/health`
 - **Method:** `GET`
 - **Description:** Checks the health of the service.
 - **Response:**
-    ```text
-    OK
+    ```json
+    {
+        "status": "Running",
+        "message": "Poll Management Service is up and running."
+    }
     ```
-- **Responses:**
+- **Response HTTP Status:**
     - `200 OK` – Service is healthy.
 
+<br />   
+   
 ## Error Codes
-
 - `400 Bad Request` – The request could not be understood or was missing required parameters.
 - `404 Not Found` – The specified resource could not be found.
 - `500 Internal Server Error` – An error occurred on the server.
+
+<br />   
 
 ## Notes
 
