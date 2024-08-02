@@ -19,7 +19,7 @@ public record PollResponse(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime timeUpdated,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime timeEnds,
+        LocalDateTime deadline,
         List<VotingItemResponse> votingItems
 ) {
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "answer_options")
+@Table(name = "voting_item_options")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -18,9 +18,9 @@ public class VotingItem {
     @Column(name = "ordinal")
     private int votingItemOrdinal;
 
-    @Column(name = "answer_text")
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "num_of_votes")
+    @Column(name = "vote_count")
     private int voteCount;
 }

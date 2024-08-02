@@ -42,10 +42,10 @@ public class PollService {
 
 
     /**
-     * Converts a list of answer strings into a list of Answer entities.
+     * Converts a list of voting items strings into a list of Answer entities.
      *
-     * @param votingItems List of answer strings to be converted.
-     * @return List of Answer entities.
+     * @param votingItems List of voting items strings to be converted.
+     * @return List of voting items entities.
      */
     private List<VotingItem> convertVotingItemsToModel(List<String> votingItems) {
         List<VotingItem> resVotingItems = new ArrayList<>();

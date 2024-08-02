@@ -31,7 +31,7 @@ public class Poll {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "num_answers_allowed")
+    @Column(name = "nof_answers_allowed")
     private int nofAnswersAllowed;
 
     @Column(name = "creator_id")

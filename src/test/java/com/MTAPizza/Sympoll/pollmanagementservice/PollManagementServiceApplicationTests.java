@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,11 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
-
     private static UUID pollId;
-
-    private static final DateTimeFormatter formatter;
-
     private static final Gson gson;
 
     /**
@@ -55,7 +49,6 @@ class PollManagementServiceApplicationTests {
 
     static {
         postgreSQLContainer.start(); //  Run mock test container.
-        formatter = DateTimeFormatter.ISO_DATE_TIME;
         gson = new Gson();
     }
 
@@ -227,7 +220,6 @@ class PollManagementServiceApplicationTests {
                 1,
                 123,
                 456,
-                LocalDateTime.now().format(formatter),
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
@@ -252,7 +244,6 @@ class PollManagementServiceApplicationTests {
                 5,
                 123,
                 456,
-                LocalDateTime.now().format(formatter),
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
