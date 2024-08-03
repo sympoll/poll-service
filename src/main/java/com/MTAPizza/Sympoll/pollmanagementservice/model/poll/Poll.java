@@ -38,7 +38,7 @@ public class Poll implements Comparable<Poll>{
     private UUID creatorId;
 
     @Column(name = "group_id")
-    private UUID groupId;
+    private String groupId;
 
     @Column(name = "time_created")
     private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.

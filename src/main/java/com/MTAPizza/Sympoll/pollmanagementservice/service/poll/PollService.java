@@ -114,7 +114,7 @@ public class PollService {
      * Get a list of all polls of a group.
      * Sorted by creation date, newest first.
      */
-    public List<PollResponse> getPollsByGroupId(UUID groupId) {
+    public List<PollResponse> getPollsByGroupId(String groupId) {
         log.info("Retrieving all polls by group ID: {}", groupId);
         return pollRepository
                 .findAll()
@@ -129,10 +129,10 @@ public class PollService {
      * Get a list of all polls of multiple groups.
      * Sorted by creation date, newest first.
      */
-    public List<PollResponse> getPollsByMultipleGroupIds(List<UUID> groupIds) {
+    public List<PollResponse> getPollsByMultipleGroupIds(List<String> groupIds) {
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
         List<Poll> resPolls = new ArrayList<>();
-        for(UUID groupId : groupIds) {
+        for(String groupId : groupIds) {
             resPolls.addAll(
                     pollRepository
                         .findAll()

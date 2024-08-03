@@ -63,7 +63,7 @@ public class ServiceController {
      */
     @GetMapping("/by-group-id")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByGroupId(@RequestParam UUID groupId){
+    public List<PollResponse> getPollsByGroupId(@RequestParam String groupId){
         log.info("Received request to get all polls of group with ID: {}", groupId);
         return pollService.getPollsByGroupId(groupId);
     }
@@ -75,7 +75,7 @@ public class ServiceController {
      */
     @PostMapping("/by-multiple-group-ids")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<UUID> groupIds){
+    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<String> groupIds){
         log.info("Received request to get all polls of groups with IDs: {}", groupIds);
         return pollService.getPollsByMultipleGroupIds(groupIds);
     }

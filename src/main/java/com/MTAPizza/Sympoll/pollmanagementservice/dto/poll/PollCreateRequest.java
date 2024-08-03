@@ -8,7 +8,7 @@ public record PollCreateRequest(
         String description,
         int nofAnswersAllowed,
         UUID creatorId,
-        UUID groupId,
+        String groupId,
         String deadline,
         List<String> votingItems) {
 }

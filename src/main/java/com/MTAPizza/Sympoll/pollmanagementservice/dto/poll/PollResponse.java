@@ -13,7 +13,7 @@ public record PollResponse(
         String description,
         int nofAnswersAllowed,
         UUID creatorId,
-        UUID groupId,
+        String groupId,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime timeCreated,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")

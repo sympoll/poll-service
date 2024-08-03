@@ -6,7 +6,7 @@ CREATE TABLE polls
     description         TEXT,
     nof_answers_allowed INT,
     creator_id          UUID,
-    group_id            UUID,
+    group_id            VARCHAR(255),
     time_created        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_updated        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deadline            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
