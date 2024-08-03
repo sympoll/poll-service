@@ -1,13 +1,14 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.dto.poll;
 
 import java.util.List;
+import java.util.UUID;
 
 public record PollCreateRequest(
         String title,
         String description,
         int nofAnswersAllowed,
-        int creatorId,
-        int groupId,
+        UUID creatorId,
+        UUID groupId,
         String deadline,
         List<String> votingItems) {
 }
