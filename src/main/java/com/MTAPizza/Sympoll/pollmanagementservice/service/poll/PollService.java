@@ -23,6 +23,11 @@ import java.util.UUID;
 public class PollService {
     private final PollRepository pollRepository;
 
+    /**
+     * Create and add a poll to the database.
+     * @param pollCreateRequest Details of the poll to add.
+     * @return The poll that was added to the database.
+     */
     public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
@@ -43,7 +48,6 @@ public class PollService {
 
     /**
      * Converts a list of voting items strings into a list of Answer entities.
-     *
      * @param votingItems List of voting items strings to be converted.
      * @return List of voting items entities.
      */
@@ -63,7 +67,6 @@ public class PollService {
 
     /**
      * Converts a timestamp string to LocalDateTime.
-     *
      * @param timeStamp The timestamp string in ISO-8601 format.
      * @return LocalDateTime representation of the timestamp.
      */
@@ -74,22 +77,70 @@ public class PollService {
 
     /**
      * Retrieves all polls from the repository and maps them to PollResponse DTOs.
-     *
      * @return List of PollResponse DTOs containing details of all polls.
      */
     public List<PollResponse> getAllPolls() {
-        return pollRepository.findAll()
+        log.info("Retrieving all polls in database...");
+        return pollRepository
+                .findAll()
                 .stream()
-                .map(Poll::toPollResponse).toList();
+                .map(Poll::toPollResponse)
+                .toList();
     }
 
+    /**
+     * Delete a poll from the database.
+     * @param pollId ID of the poll to delete.
+     * @return the ID of the poll deleted.
+     */
     public UUID deletePoll(UUID pollId) {
+        log.info("Deleting poll with ID: {}", pollId);
         pollRepository.deleteById(pollId);
         log.info("POLL: {} was deleted.", pollId);
         return pollId;
     }
 
+    /**
+     * Retrieve a poll from the database.
+     * @param pollId ID of the poll to retrieve.
+     * @return The retrieved poll's details.
+     */
     public PollResponse getPollById(UUID pollId) {
+        log.info("Retrieving poll with ID: {}", pollId);
         return pollRepository.getReferenceById(pollId).toPollResponse();
+    }
+
+    /**
+     * Get a list of all polls of a group.
+     * Sorted by creation date, newest first.
+     */
+    public List<PollResponse> getPollsByGroupId(UUID groupId) {
+        log.info("Retrieving all polls by group ID: {}", groupId);
+        return pollRepository
+                .findAll()
+                .stream()
+                .filter(poll -> poll.getGroupId().equals(groupId))
+                .map(Poll::toPollResponse)
+                .sorted() // Sort by date, most recent poll first.
+                .toList();
+    }
+
+    /**
+     * Get a list of all polls of multiple groups.
+     * Sorted by creation date, newest first.
+     */
+    public List<PollResponse> getPollsByMultipleGroupIds(List<UUID> groupIds) {
+        log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
+        List<PollResponse> resPolls = new ArrayList<>();
+        for(UUID groupId : groupIds) {
+            resPolls.addAll(
+                    pollRepository
+                        .findAll()
+                        .stream()
+                        .filter(poll -> poll.getGroupId().equals(groupId))
+                        .map(Poll::toPollResponse)
+                        .toList());
+        }
+        return resPolls.stream().sorted().toList(); // Sort the result polls by date, most recent poll first, and return the result.
     }
 }
