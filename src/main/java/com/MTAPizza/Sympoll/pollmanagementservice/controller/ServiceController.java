@@ -73,7 +73,7 @@ public class ServiceController {
      * @param groupIds List of group IDs to fetch their polls.
      * @return List of polls of the received groups, sorted by date posted, newest first.
      */
-    @GetMapping("/by-multiple-group-ids")
+    @PostMapping("/by-multiple-group-ids")
     @ResponseStatus(HttpStatus.OK)
     public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<UUID> groupIds){
         log.info("Received request to get all polls of groups with IDs: {}", groupIds);
