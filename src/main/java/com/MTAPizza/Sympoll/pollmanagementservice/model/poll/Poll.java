@@ -1,8 +1,8 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.answer.AnswerResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.voting.item.VotingItemResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
+import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +31,8 @@ public class Poll {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "num_answers_allowed")
-    private int numAnswersAllowed;
+    @Column(name = "nof_answers_allowed")
+    private int nofAnswersAllowed;
 
     @Column(name = "creator_id")
     private int creatorId;
@@ -51,7 +51,7 @@ public class Poll {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "poll_id")
-    private List<Answer> answersList;
+    private List<VotingItem> votingItems;
 
     /**
      * @return A PollResponse representation if this poll
@@ -61,7 +61,7 @@ public class Poll {
                 this.getPollId(),
                 this.getTitle(),
                 this.getDescription(),
-                this.getNumAnswersAllowed(),
+                this.getNofAnswersAllowed(),
                 this.getCreatorId(),
                 this.getGroupId(),
                 this.getTimeCreated(),
@@ -69,11 +69,11 @@ public class Poll {
                 this.getDeadline(),
 
                 /* Convert Answers to answer responses */
-                this.getAnswersList().stream().map(answer -> new AnswerResponse(
-                        answer.getAnswerId(),
-                        answer.getAnswerOrdinal(),
-                        answer.getAnswerContent(),
-                        answer.getNumberOfVotes()
+                this.getVotingItems().stream().map(votingItem -> new VotingItemResponse(
+                        votingItem.getVotingItemId(),
+                        votingItem.getVotingItemOrdinal(),
+                        votingItem.getDescription(),
+                        votingItem.getVoteCount()
                 )).toList());
     }
 }

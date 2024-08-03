@@ -2,7 +2,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.model.answer.Answer;
+import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
@@ -27,11 +27,11 @@ public class PollService {
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
                 .description(pollCreateRequest.description())
-                .numAnswersAllowed(pollCreateRequest.numAnswersAllowed())
+                .nofAnswersAllowed(pollCreateRequest.nofAnswersAllowed())
                 .creatorId(pollCreateRequest.creatorId())
                 .groupId(pollCreateRequest.groupId())
                 .deadline(convertToDate(pollCreateRequest.deadline()))
-                .answersList(convertAnswersToModel(pollCreateRequest.answers()))
+                .votingItems(convertVotingItemsToModel(pollCreateRequest.votingItems()))
                 .build();
 
         Validator.validateNewPoll(poll);
@@ -42,23 +42,23 @@ public class PollService {
 
 
     /**
-     * Converts a list of answer strings into a list of Answer entities.
+     * Converts a list of voting items strings into a list of Answer entities.
      *
-     * @param answers List of answer strings to be converted.
-     * @return List of Answer entities.
+     * @param votingItems List of voting items strings to be converted.
+     * @return List of voting items entities.
      */
-    private List<Answer> convertAnswersToModel(List<String> answers) {
-        List<Answer> newAnswersList = new ArrayList<>();
+    private List<VotingItem> convertVotingItemsToModel(List<String> votingItems) {
+        List<VotingItem> resVotingItems = new ArrayList<>();
         int ord = 0;
-        for (String answer : answers) {
-            Answer newAnswer = new Answer();
-            newAnswer.setAnswerContent(answer);
-            newAnswer.setAnswerOrdinal(ord++);
-            newAnswer.setNumberOfVotes(0);
-            newAnswersList.add(newAnswer);
+        for (String votingItem : votingItems) {
+            VotingItem newVotingItem = new VotingItem();
+            newVotingItem.setDescription(votingItem);
+            newVotingItem.setVotingItemOrdinal(ord++);
+            newVotingItem.setVoteCount(0);
+            resVotingItems.add(newVotingItem);
         }
 
-        return newAnswersList;
+        return resVotingItems;
     }
 
     /**

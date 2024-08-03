@@ -2,7 +2,6 @@ package com.MTAPizza.Sympoll.pollmanagementservice.validator;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
 
 import java.time.LocalDateTime;
 
@@ -13,12 +12,12 @@ import java.time.LocalDateTime;
 @Slf4j
 public class Validator {
     public static void validateNewPoll(Poll poll) throws IllegalArgumentException{
-        validateAllowedAnswers(poll.getAnswersList().size(), poll);
+        validateAllowedVotingItems(poll.getVotingItems().size(), poll);
         validateDeadline(poll.getTimeCreated(), poll);
     }
 
-    private static void validateAllowedAnswers(int numOfAnswers, Poll poll) {
-        if (poll.getNumAnswersAllowed() > numOfAnswers) {
+    private static void validateAllowedVotingItems(int nofVotingItems, Poll poll) {
+        if (poll.getNofAnswersAllowed() > nofVotingItems) {
             log.warn("User {} tried to create a poll but an number of answers allowed was given.", poll.getCreatorId());
             throw new IllegalArgumentException("Number of allowed answers is greater than number of available answers");
         }
