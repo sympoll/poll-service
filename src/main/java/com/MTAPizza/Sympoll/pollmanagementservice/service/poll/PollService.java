@@ -120,8 +120,8 @@ public class PollService {
                 .findAll()
                 .stream()
                 .filter(poll -> poll.getGroupId().equals(groupId))
-                .map(Poll::toPollResponse)
                 .sorted() // Sort by date, most recent poll first.
+                .map(Poll::toPollResponse)
                 .toList();
     }
 
@@ -131,16 +131,18 @@ public class PollService {
      */
     public List<PollResponse> getPollsByMultipleGroupIds(List<UUID> groupIds) {
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
-        List<PollResponse> resPolls = new ArrayList<>();
+        List<Poll> resPolls = new ArrayList<>();
         for(UUID groupId : groupIds) {
             resPolls.addAll(
                     pollRepository
                         .findAll()
                         .stream()
                         .filter(poll -> poll.getGroupId().equals(groupId))
-                        .map(Poll::toPollResponse)
                         .toList());
         }
-        return resPolls.stream().sorted().toList(); // Sort the result polls by date, most recent poll first, and return the result.
+        // First Sort the result polls by date, most recent poll first,
+        // then map each Poll to a PollResponse object,
+        // and return the result.
+        return resPolls.stream().sorted().map(Poll::toPollResponse).toList();
     }
 }
