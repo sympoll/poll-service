@@ -64,8 +64,8 @@ class PollManagementServiceApplicationTests {
                   "title": "Favorite Programming Language",
                   "description": "Vote for your favorite programming language",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "3d20b0b8-cff2-40ce-b584-36f5de930925",
+                  "groupId": "456",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "votingItems": [
                     "Java",
@@ -88,8 +88,8 @@ class PollManagementServiceApplicationTests {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "3d20b0b8-cff2-40ce-b584-36f5de930925",
+                  "groupId": "456",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "votingItems": [
                     "Benz Brothers",
@@ -214,12 +214,14 @@ class PollManagementServiceApplicationTests {
      * Test if to see that the system can detect if the user gave an earlier deadline than the poll's creation time.
      */
     void tryToCreatePollWithInvalidDate(){
+        UUID uuid = UUID.fromString("3d20b0b8-cff2-40ce-b584-36f5de930925");
+
         PollCreateRequest request = new PollCreateRequest(
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 1,
-                123,
-                456,
+                uuid,
+                "456",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
@@ -238,12 +240,14 @@ class PollManagementServiceApplicationTests {
      * Test to see if the system can detect that the user gave the option to select more answers than the actual number of answers provided.
      */
     void tryToCreatePollWithInvalidAnswersAllowed(){
+        UUID uuid = UUID.fromString("3d20b0b8-cff2-40ce-b584-36f5de930925");
+
         PollCreateRequest request = new PollCreateRequest(
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 5,
-                123,
-                456,
+                uuid,
+                "456",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
@@ -267,8 +271,8 @@ class PollManagementServiceApplicationTests {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "3d20b0b8-cff2-40ce-b584-36f5de930925",
+                  "groupId": "456",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "invalidField": "value"
                   "votingItems": [

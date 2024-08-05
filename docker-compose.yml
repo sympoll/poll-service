@@ -1,9 +1,7 @@
-version: '4'
-
 services:
-  postgresql:
+  poll-db:
     image: postgres:16.2
-    container_name: sympoll-db-poll-test
+    container_name: poll-db
     ports:
       - "5432:5432"
     environment:
@@ -12,3 +10,19 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data  # Maps the local directory ./data to the container’s data directory for data persistence.
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql  # Maps the local SQL file ./docker/init.sql to the container’s initialization directory to run when the container starts.
+    networks:
+      - sympoll-network
+
+#  poll-service:
+#    image:  poll-service-test:1.0
+#    container_name: poll-service-test
+#    ports:
+#      - "8082:8082"
+#    depends_on:
+#      - poll-db
+#    networks:
+#      - sympoll-network
+
+networks:
+  sympoll-network:
+    driver: bridge
