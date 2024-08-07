@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Data
-public class Poll {
+public class Poll implements Comparable<Poll>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,13 +32,13 @@ public class Poll {
     private String description;
 
     @Column(name = "nof_answers_allowed")
-    private int nofAnswersAllowed;
+    private Integer nofAnswersAllowed;
 
     @Column(name = "creator_id")
-    private int creatorId;
+    private UUID creatorId;
 
     @Column(name = "group_id")
-    private int groupId;
+    private String groupId;
 
     @Column(name = "time_created")
     private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.
@@ -75,5 +75,15 @@ public class Poll {
                         votingItem.getDescription(),
                         votingItem.getVoteCount()
                 )).toList());
+    }
+
+    /**
+     * Compare two polls by the timeCreated field.
+     * @param other the object to be compared.
+     * @return the most recent poll of the two.
+     */
+    @Override
+    public int compareTo(Poll other) {
+        return other.getTimeCreated().compareTo(this.getTimeCreated());
     }
 }

@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PollManagementServiceApplicationTests {
     private static UUID pollId;
     private static final Gson gson;
+    private static final UUID rndCreatorUUID = UUID.randomUUID();
 
     /**
     * Initialize postgres test container with the init script inside poll-management-service/test/resources
@@ -59,13 +60,13 @@ class PollManagementServiceApplicationTests {
     @Test
     @Order(1)
     void shouldCreatePoll() {
-        String requestBodyProg = """
+        String requestBodyProg = String.format("""
                 {
                   "title": "Favorite Programming Language",
                   "description": "Vote for your favorite programming language",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "%s",
+                  "groupId": "123",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "votingItems": [
                     "Java",
@@ -74,7 +75,7 @@ class PollManagementServiceApplicationTests {
                     "JavaScript"
                   ]
                 }
-                """;
+                """, rndCreatorUUID);
 
         PollResponse pollResponseProg = tryToCreatePollAndAssertStatusCode(requestBodyProg, HttpStatus.CREATED).as(PollResponse.class);
 
@@ -83,13 +84,13 @@ class PollManagementServiceApplicationTests {
         assertEquals("Favorite Programming Language", pollResponseProg.title()); // Verify title
         assertEquals(4, pollResponseProg.votingItems().size(), "Expected 4 answers in the response"); // Verify 4 answers were created
 
-        String requestBodyBurger = """
+        String requestBodyBurger = String.format("""
                 {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "%s",
+                  "groupId": "123",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "votingItems": [
                     "Benz Brothers",
@@ -99,7 +100,7 @@ class PollManagementServiceApplicationTests {
                     "Marlen"
                   ]
                 }
-                """;
+                """, rndCreatorUUID);
 
         PollResponse pollResponseBurger = tryToCreatePollAndAssertStatusCode(requestBodyBurger, HttpStatus.CREATED).as(PollResponse.class);
 
@@ -218,8 +219,8 @@ class PollManagementServiceApplicationTests {
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 1,
-                123,
-                456,
+                rndCreatorUUID,
+                "123",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
@@ -242,8 +243,8 @@ class PollManagementServiceApplicationTests {
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 5,
-                123,
-                456,
+                rndCreatorUUID,
+                "123",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
         );
@@ -262,13 +263,13 @@ class PollManagementServiceApplicationTests {
      * Test if the system can handle a request to create a poll with a query parameter that doesn't exist ("Field").
      */
     void tryToCreatePollUsingInvalidRequestBody(){
-        String requestBody = """
+        String requestBody = String.format("""
                 {
                   "title": "Favorite burger in Tel Aviv",
                   "description": "Vote for your favorite burger in Tel Aviv",
                   "nofAnswersAllowed": 1,
-                  "creatorId": 123,
-                  "groupId": 456,
+                  "creatorId": "%s",
+                  "groupId": "123",
                   "deadline": "2024-12-22T10:00:00.000Z",
                   "invalidField": "value"
                   "votingItems": [
@@ -279,7 +280,7 @@ class PollManagementServiceApplicationTests {
                     "Marlen"
                   ]
                 }
-                """;
+                """, rndCreatorUUID);
 
         // Perform the POST request with the invalid request body
         Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
