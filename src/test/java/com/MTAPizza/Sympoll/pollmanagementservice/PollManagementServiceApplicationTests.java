@@ -10,6 +10,8 @@ import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
+    private static final Logger log = LoggerFactory.getLogger(PollManagementServiceApplicationTests.class);
     private static UUID pollId;
     private static int javaVoteId;
     private static final Gson gson;
@@ -299,10 +302,12 @@ class PollManagementServiceApplicationTests {
         String requestBody = String.format("""
                 {
                   "pollId": "%s",
-                  "creatorId": "%s",
+                  "userId": "%s",
                   "votingItemId": %d
                 }
                 """, pollId, rndCreatorUUID, javaVoteId);
+
+        log.info(requestBody);
 
         // Check that response is in fact 201
         Response response = RestAssured.given()
