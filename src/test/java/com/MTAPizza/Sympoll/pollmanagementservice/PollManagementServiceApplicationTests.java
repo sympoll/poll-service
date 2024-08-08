@@ -3,6 +3,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
     private static UUID pollId;
+    private static int javaVoteId;
     private static final Gson gson;
     private static final UUID rndCreatorUUID = UUID.randomUUID();
 
@@ -146,6 +148,7 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
         pollId = pollResponses.get(0).pollId();
+        javaVoteId = pollResponses.get(0).votingItems().get(0).votingItemId();
     }
 
 
@@ -293,6 +296,28 @@ class PollManagementServiceApplicationTests {
     @Test
     @Order(6)
     void shouldCreateVotes(){
+        String requestBody = String.format("""
+                {
+                  "pollId": "%s",
+                  "creatorId": "%s",
+                  "votingItemId": %d
+                }
+                """, pollId, rndCreatorUUID, javaVoteId);
 
+        // Check that response is in fact 201
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/api/poll/vote")
+                .then()
+                .statusCode(201)
+                .extract().response();
+
+        VoteResponse voteResponse = response.as(VoteResponse.class);
+
+        /* Verify vote response */
+        assertEquals(rndCreatorUUID, voteResponse.userId());
+        assertEquals(javaVoteId, voteResponse.votingItemId());
     }
 }
