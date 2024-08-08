@@ -38,8 +38,8 @@ public class PollService {
                 .creatorId(pollCreateRequest.creatorId())
                 .groupId(pollCreateRequest.groupId())
                 .deadline(convertToDate(pollCreateRequest.deadline()))
-                .votingItems(convertVotingItemsToModel(pollCreateRequest.votingItems()))
                 .build();
+        poll.setVotingItems(convertVotingItemsToModel(pollCreateRequest.votingItems(), poll.getPollId()));
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
@@ -52,11 +52,12 @@ public class PollService {
      * @param votingItems List of voting items strings to be converted.
      * @return List of voting items entities.
      */
-    private List<VotingItem> convertVotingItemsToModel(List<String> votingItems) {
+    private List<VotingItem> convertVotingItemsToModel(List<String> votingItems, UUID pollId) {
         List<VotingItem> resVotingItems = new ArrayList<>();
         int ord = 0;
         for (String votingItem : votingItems) {
             VotingItem newVotingItem = new VotingItem();
+            newVotingItem.setPollId(pollId);
             newVotingItem.setDescription(votingItem);
             newVotingItem.setVotingItemOrdinal(ord++);
             newVotingItem.setVoteCount(0);

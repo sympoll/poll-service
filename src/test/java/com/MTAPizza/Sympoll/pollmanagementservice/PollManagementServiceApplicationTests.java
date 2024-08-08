@@ -289,4 +289,10 @@ class PollManagementServiceApplicationTests {
         IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
     }
+
+    @Test
+    @Order(6)
+    void shouldCreateVotes(){
+
+    }
 }
