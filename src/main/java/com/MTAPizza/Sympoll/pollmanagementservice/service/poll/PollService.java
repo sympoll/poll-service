@@ -29,6 +29,8 @@ public class PollService {
      * @return The poll that was added to the database.
      */
     public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
+        Validator.validateNewPoll(pollCreateRequest);
+
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
                 .description(pollCreateRequest.description())
@@ -39,7 +41,6 @@ public class PollService {
                 .votingItems(convertVotingItemsToModel(pollCreateRequest.votingItems()))
                 .build();
 
-        Validator.validateNewPoll(poll);
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
         return poll.toPollResponse();
