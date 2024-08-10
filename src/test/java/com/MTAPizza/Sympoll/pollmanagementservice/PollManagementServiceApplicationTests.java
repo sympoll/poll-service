@@ -310,7 +310,7 @@ class PollManagementServiceApplicationTests {
                 """, pollIdForVote, rndCreatorUUID, javaVoteId);
 
         // Check that response is in fact 201
-        Response response = RestAssured.given()
+        Response firstResponse = RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
                 .when()
@@ -319,10 +319,22 @@ class PollManagementServiceApplicationTests {
                 .statusCode(201)
                 .extract().response();
 
-        VoteResponse voteResponse = response.as(VoteResponse.class);
+        VoteResponse voteResponse = firstResponse.as(VoteResponse.class);
+
+        Response secResponse = RestAssured.given()
+                .queryParam("pollId", pollIdForVote)
+                .contentType("application/json")
+                .when()
+                .get("/api/poll/by-poll-id")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        PollResponse pollResponse = secResponse.as(PollResponse.class);
 
         /* Verify vote response */
         assertEquals(rndCreatorUUID, voteResponse.userId());
         assertEquals(javaVoteId, voteResponse.votingItemId());
+        assertEquals(1, pollResponse.votingItems().get(0).voteCount());
     }
 }

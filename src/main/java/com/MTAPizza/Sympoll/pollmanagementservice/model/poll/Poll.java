@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,7 +70,9 @@ public class Poll implements Comparable<Poll>{
                 this.getDeadline(),
 
                 /* Convert Answers to answer responses */
-                this.getVotingItems().stream().map(votingItem -> new VotingItemResponse(
+                this.getVotingItems().stream()
+                        .sorted(Comparator.comparing(VotingItem::getVotingItemId))
+                        .map(votingItem -> new VotingItemResponse(
                         votingItem.getVotingItemId(),
                         votingItem.getVotingItemOrdinal(),
                         votingItem.getDescription(),
