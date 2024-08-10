@@ -330,27 +330,45 @@ class PollManagementServiceApplicationTests {
     @Test
     @Order(7)
     void shouldGetVoteCount() {
-        String requestBody = String.format("""
-                {
-                  "pollId": "%s",
-                  "votingItemId": %d
-                }
-                """, pollIdForVote, javaVoteId);
-
         // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
-                .body(requestBody)
+                .queryParam("votingItemId", javaVoteId)
                 .when()
                 .get("/api/poll/vote")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        VoteCountResponse voteCountResponse = response.as(VoteCountResponse.class);
+        int voteCountResponse = response.as(Integer.class);
 
         /* Verify vote response */
-        assertEquals(javaVoteId, voteCountResponse.votingItemId());
-        assertEquals(1, voteCountResponse.voteCount(), "Expected 1 vote count");
+        assertEquals(1, voteCountResponse, "Expected 1 vote count");
+    }
+
+    @Test
+    @Order(8)
+    void shouldDeleteVote() {
+        // For this test 'voteId' argument is irrelevant so by default send 'pollIdForVote' as a placeholder for this UUID.
+        String requestBodyDelete = String.format("""
+                {
+                  "voteId": "%s",
+                  "votingItemId": %d
+                }
+                """, pollIdForVote, javaVoteId);
+
+        // Check that response is in fact 200
+        Response responseDelete = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBodyDelete)
+                .when()
+                .delete("/api/poll/vote")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        UUID voteIdResponse = responseDelete.as(UUID.class);
+
+
     }
 }

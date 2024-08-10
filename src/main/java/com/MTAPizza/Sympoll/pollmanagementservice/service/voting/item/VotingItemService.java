@@ -2,8 +2,6 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +26,10 @@ public class VotingItemService {
         return new VoteResponse(createVoteRequest.userId(), createVoteRequest.votingItemId(), LocalDateTime.now());
     }
 
-    public VoteCountResponse getVoteCount(VoteCountRequest voteCountRequest) {
-        // TODO: validate vote count request here.
+    public int getVoteCount(int votingItemId) {
+        // TODO: validate voting item id here.
 
-        VotingItem votingItem = votingItemRepository.getReferenceById(voteCountRequest.votingItemId());
-        return new VoteCountResponse(voteCountRequest.pollId(), voteCountRequest.votingItemId(), votingItem.getVoteCount());
+        VotingItem votingItem = votingItemRepository.getReferenceById(votingItemId);
+        return votingItem.getVoteCount();
     }
 }

@@ -5,8 +5,6 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item.VotingItemService;
 import lombok.RequiredArgsConstructor;
@@ -119,8 +117,8 @@ public class ServiceController {
 
     @GetMapping("/vote")
     @ResponseStatus(HttpStatus.OK)
-    public VoteCountResponse getVoteCount(@RequestBody VoteCountRequest voteCountRequest) {
+    public Integer getVoteCount(@RequestParam int votingItemId) {
         log.info("Received request to retrieve vote count");
-        return votingItemService.getVoteCount(voteCountRequest);
+        return votingItemService.getVoteCount(votingItemId);
     }
 }
