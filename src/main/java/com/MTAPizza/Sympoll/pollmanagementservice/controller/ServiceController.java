@@ -5,6 +5,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item.VotingItemService;
 import lombok.RequiredArgsConstructor;
@@ -120,5 +121,13 @@ public class ServiceController {
     public Integer getVoteCount(@RequestParam int votingItemId) {
         log.info("Received request to retrieve vote count");
         return votingItemService.getVoteCount(votingItemId);
+    }
+
+    @DeleteMapping("/vote")
+    @ResponseStatus(HttpStatus.OK)
+    public UUID deleteVote(@RequestBody VoteDeleteRequest voteDeleteRequest) {
+        log.info("Received request to delete vote");
+        log.debug("Vote ID received to be deleted: {}", voteDeleteRequest.voteId());
+        return votingItemService.deleteVote(voteDeleteRequest);
     }
 }
