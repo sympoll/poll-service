@@ -5,6 +5,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
+import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Slf4j
 public class VotingItemService {
     private final VotingItemRepository votingItemRepository;
+    private final Validator validator;
 
     /**
      * Update a specific vote in the database.
@@ -24,7 +26,7 @@ public class VotingItemService {
      * @return The created vote for the Voting service.
      */
     public VoteResponse createVote(VoteCreateRequest createVoteRequest) {
-        //TODO: validate vote request here.
+        validator.validateNewVote(createVoteRequest);
 
         VotingItem votingItem = votingItemRepository.getReferenceById(createVoteRequest.votingItemId());
         votingItem.setVoteCount(votingItem.getVoteCount() + 1);
@@ -39,7 +41,7 @@ public class VotingItemService {
      * @return Count of votes for the requested vote.
      */
     public int getVoteCount(int votingItemId) {
-        // TODO: validate voting item id here.
+        validator.validateVotingItemIdExists(votingItemId);
 
         VotingItem votingItem = votingItemRepository.getReferenceById(votingItemId);
         return votingItem.getVoteCount();
@@ -51,7 +53,7 @@ public class VotingItemService {
      * @return The UUID of the vote that was deleted.
      */
     public UUID deleteVote(VoteDeleteRequest voteDeleteRequest) {
-        //TODO: validate vote delete request here. (Including checking the current vote count before decrementing)
+        validator.validateDeleteVote(voteDeleteRequest);
 
         VotingItem votingItem = votingItemRepository.getReferenceById(voteDeleteRequest.votingItemId());
         votingItem.setVoteCount(votingItem.getVoteCount() - 1);
