@@ -4,6 +4,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentE
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
@@ -336,5 +337,32 @@ class PollManagementServiceApplicationTests {
         assertEquals(rndCreatorUUID, voteResponse.userId());
         assertEquals(javaVoteId, voteResponse.votingItemId());
         assertEquals(1, pollResponse.votingItems().get(0).voteCount());
+    }
+
+    @Test
+    @Order(7)
+    void shouldGetVoteCount() {
+        String requestBody = String.format("""
+                {
+                  "pollId": "%s",
+                  "votingItemId": %d
+                }
+                """, pollIdForVote, javaVoteId);
+
+        // Check that response is in fact 201
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .get("/api/poll/vote")
+                .then()
+                .statusCode(201)
+                .extract().response();
+
+        VoteCountResponse voteCountResponse = response.as(VoteCountResponse.class);
+
+        /* Verify vote response */
+        assertEquals(javaVoteId, voteCountResponse.votingItemId());
+        assertEquals(1, voteCountResponse.voteCount(), "Expected 1 vote count");
     }
 }
