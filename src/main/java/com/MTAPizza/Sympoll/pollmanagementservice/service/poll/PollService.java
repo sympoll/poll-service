@@ -22,6 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class PollService {
     private final PollRepository pollRepository;
+    private final Validator validator;
 
     /**
      * Create and add a poll to the database.
@@ -29,7 +30,7 @@ public class PollService {
      * @return The poll that was added to the database.
      */
     public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
-        Validator.validateNewPoll(pollCreateRequest);
+        validator.validateNewPoll(pollCreateRequest);
 
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
