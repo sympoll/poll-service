@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PollManagementServiceApplicationTests {
     private static final Logger log = LoggerFactory.getLogger(PollManagementServiceApplicationTests.class);
     private static UUID pollId;
+    private static UUID pollIdForVote;
     private static int javaVoteId;
     private static final Gson gson;
     private static final UUID rndCreatorUUID = UUID.randomUUID();
@@ -151,7 +152,8 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
         pollId = pollResponses.get(0).pollId();
-        javaVoteId = pollResponses.get(0).votingItems().get(0).votingItemId();
+        pollIdForVote = pollResponses.get(1).pollId();
+        javaVoteId = pollResponses.get(1).votingItems().get(0).votingItemId();
     }
 
 
@@ -305,9 +307,7 @@ class PollManagementServiceApplicationTests {
                   "userId": "%s",
                   "votingItemId": %d
                 }
-                """, pollId, rndCreatorUUID, javaVoteId);
-
-        log.info(requestBody);
+                """, pollIdForVote, rndCreatorUUID, javaVoteId);
 
         // Check that response is in fact 201
         Response response = RestAssured.given()
