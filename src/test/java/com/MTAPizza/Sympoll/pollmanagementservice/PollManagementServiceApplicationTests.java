@@ -4,7 +4,6 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentE
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
@@ -342,14 +341,14 @@ class PollManagementServiceApplicationTests {
 
         int voteCountResponse = response.as(Integer.class);
 
-        /* Verify vote response */
+        /* Verify vote count */
         assertEquals(1, voteCountResponse, "Expected 1 vote count");
     }
 
     @Test
     @Order(8)
     void shouldDeleteVote() {
-        // For this test 'voteId' argument is irrelevant so by default send 'pollIdForVote' as a placeholder for this UUID.
+        // For this test 'voteId' argument is irrelevant. So, the test sends 'pollIdForVote' as a placeholder for this UUID.
         String requestBodyDelete = String.format("""
                 {
                   "voteId": "%s",
@@ -369,6 +368,21 @@ class PollManagementServiceApplicationTests {
 
         UUID voteIdResponse = responseDelete.as(UUID.class);
 
+        // Check that response is in fact 200
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .queryParam("votingItemId", javaVoteId)
+                .when()
+                .get("/api/poll/vote")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        int voteCountResponse = response.as(Integer.class);
+
+        /* Verify vote count */
+        assertNotNull(voteIdResponse);
+        assertEquals(0, voteCountResponse, "Expected 0 vote count");
 
     }
 }
