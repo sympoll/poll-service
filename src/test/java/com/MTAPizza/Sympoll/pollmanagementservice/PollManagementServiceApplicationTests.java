@@ -33,7 +33,7 @@ class PollManagementServiceApplicationTests {
     private static final Logger log = LoggerFactory.getLogger(PollManagementServiceApplicationTests.class);
     private static UUID pollId;
     private static UUID pollIdForVote;
-    private static int javaVoteId;
+    private static int benzVoteId;
     private static final Gson gson;
     private static final UUID rndCreatorUUID = UUID.randomUUID();
 
@@ -153,7 +153,7 @@ class PollManagementServiceApplicationTests {
         assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
         pollId = pollResponses.get(0).pollId();
         pollIdForVote = pollResponses.get(1).pollId();
-        javaVoteId = pollResponses.get(1).votingItems().get(0).votingItemId();
+        benzVoteId = pollResponses.get(1).votingItems().get(0).votingItemId();
     }
 
 
@@ -298,6 +298,9 @@ class PollManagementServiceApplicationTests {
         assertNotNull(errorResponse, "Error response should not be null");
     }
 
+    /**
+     * Send request to create vote for 'Benz Brothers' in the second poll.
+     */
     @Test
     @Order(6)
     void shouldCreateVotes(){
@@ -307,7 +310,7 @@ class PollManagementServiceApplicationTests {
                   "userId": "%s",
                   "votingItemId": %d
                 }
-                """, pollIdForVote, rndCreatorUUID, javaVoteId);
+                """, pollIdForVote, rndCreatorUUID, benzVoteId);
 
         // Check that response is in fact 201
         Response response = RestAssured.given()
@@ -323,16 +326,19 @@ class PollManagementServiceApplicationTests {
 
         /* Verify vote response */
         assertEquals(rndCreatorUUID, voteResponse.userId());
-        assertEquals(javaVoteId, voteResponse.votingItemId());
+        assertEquals(benzVoteId, voteResponse.votingItemId());
     }
 
+    /**
+     * Send request to verify the vote count of 'Benz Brothers' in the second poll.
+     */
     @Test
     @Order(7)
     void shouldGetVoteCount() {
         // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
-                .queryParam("votingItemId", javaVoteId)
+                .queryParam("votingItemId", benzVoteId)
                 .when()
                 .get("/api/poll/vote")
                 .then()
@@ -345,6 +351,9 @@ class PollManagementServiceApplicationTests {
         assertEquals(1, voteCountResponse, "Expected 1 vote count");
     }
 
+    /**
+     * Send request to delete the vote for 'Benz Brothers' in the second poll.
+     */
     @Test
     @Order(8)
     void shouldDeleteVote() {
@@ -354,7 +363,7 @@ class PollManagementServiceApplicationTests {
                   "voteId": "%s",
                   "votingItemId": %d
                 }
-                """, pollIdForVote, javaVoteId);
+                """, pollIdForVote, benzVoteId);
 
         // Check that response is in fact 200
         Response responseDelete = RestAssured.given()
@@ -371,7 +380,7 @@ class PollManagementServiceApplicationTests {
         // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
-                .queryParam("votingItemId", javaVoteId)
+                .queryParam("votingItemId", benzVoteId)
                 .when()
                 .get("/api/poll/vote")
                 .then()

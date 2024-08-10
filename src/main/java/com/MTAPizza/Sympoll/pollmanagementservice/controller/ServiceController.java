@@ -109,6 +109,11 @@ public class ServiceController {
         return new HealthResponse("Running", "Poll Management Service is up and running.");
     }
 
+    /**
+     * Update a specific vote in the database.
+     * @param createVoteRequest Information of the vote to be created.
+     * @return The created vote for the Voting service.
+     */
     @PostMapping("/vote")
     @ResponseStatus(HttpStatus.CREATED)
     public VoteResponse createVote(@RequestBody VoteCreateRequest createVoteRequest) {
@@ -116,6 +121,11 @@ public class ServiceController {
         return votingItemService.createVote(createVoteRequest);
     }
 
+    /**
+     * Retrieve votes count of a specific vote.
+     * @param votingItemId Voting item ID of requested vote.
+     * @return Count of votes for the requested vote.
+     */
     @GetMapping("/vote")
     @ResponseStatus(HttpStatus.OK)
     public Integer getVoteCount(@RequestParam int votingItemId) {
@@ -123,6 +133,11 @@ public class ServiceController {
         return votingItemService.getVoteCount(votingItemId);
     }
 
+    /**
+     * Update vote count decrement in the database.
+     * @param voteDeleteRequest Information of the vote to be deleted.
+     * @return The UUID of the vote that was deleted.
+     */
     @DeleteMapping("/vote")
     @ResponseStatus(HttpStatus.OK)
     public UUID deleteVote(@RequestBody VoteDeleteRequest voteDeleteRequest) {

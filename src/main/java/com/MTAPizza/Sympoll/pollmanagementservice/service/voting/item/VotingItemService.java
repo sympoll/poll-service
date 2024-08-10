@@ -18,6 +18,11 @@ import java.util.UUID;
 public class VotingItemService {
     private final VotingItemRepository votingItemRepository;
 
+    /**
+     * Update a specific vote in the database.
+     * @param createVoteRequest Information of the vote to be created.
+     * @return The created vote for the Voting service.
+     */
     public VoteResponse createVote(VoteCreateRequest createVoteRequest) {
         //TODO: validate vote request here.
 
@@ -28,6 +33,11 @@ public class VotingItemService {
         return new VoteResponse(createVoteRequest.userId(), createVoteRequest.votingItemId(), LocalDateTime.now());
     }
 
+    /**
+     * Retrieve votes count of a specific vote.
+     * @param votingItemId Voting item ID of requested vote.
+     * @return Count of votes for the requested vote.
+     */
     public int getVoteCount(int votingItemId) {
         // TODO: validate voting item id here.
 
@@ -35,6 +45,11 @@ public class VotingItemService {
         return votingItem.getVoteCount();
     }
 
+    /**
+     * Update vote count decrement in the database.
+     * @param voteDeleteRequest Information of the vote to be deleted.
+     * @return The UUID of the vote that was deleted.
+     */
     public UUID deleteVote(VoteDeleteRequest voteDeleteRequest) {
         //TODO: validate vote delete request here. (Including checking the current vote count before decrementing)
 
