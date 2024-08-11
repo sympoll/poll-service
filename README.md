@@ -15,17 +15,33 @@
 3. [Error Codes](#3-error-codes)
 4. [Notes](#4-notes)
 
+<br />
+
+
+
 ## 1) About
 
 The Poll Service is a RESTful API for creating, retrieving, and deleting polls. It manages poll data and interacts with the Vote Service to keep vote counts up to date.
 
+<br />
+
+
+
 ## 2) Architecture
+
+---
 
 ### 2.1) Ports
 
 - **Service port:**  8082
 
 - **Database port:**  5432
+
+---
+
+<br />
+
+
 
 ### 2.2) Poll Management Service Schema
 
@@ -56,11 +72,28 @@ CREATE TABLE voting_item_options
 );
 ```
 
-### 2.3) Create a Poll
+---
+
+<br />
+
+
+
+### 2.3) Endpoints
+
+**BASE URL:** `/api/poll`.
+
+All calls to this service must start with the base URL. Any additional URL fields will be specified
+if relevant.
+
+---
+
+<br />
+
+
+
+#### 2.3.1) Create a poll
 
 - **Method:**  POST
-
-- **Endpoint:**  `/api/poll`
 
 - **Description:**  Creates a new poll.
 
@@ -118,11 +151,16 @@ CREATE TABLE voting_item_options
 
   - `400 Bad Request` – Invalid input data.
 
-### 2.4) Get All Polls
+---
+<br />
+
+
+
+#### 2.3.2) Get All Polls
 
 - **Method:**  GET
 
-- **Endpoint:**  `/api/poll/all`
+- **Endpoint:**  `/all`
 
 - **Description:**  Retrieves a list of all polls.
 
@@ -155,11 +193,16 @@ CREATE TABLE voting_item_options
 - **Response HTTP Status:**
   - `200 OK` – List of polls successfully retrieved.
 
-### 2.5) Get Poll by ID
+---
+<br />
+
+
+
+#### 2.3.3) Get Poll by ID
 
 - **Method:**  GET
 
-- **Endpoint:**  `/api/poll/by-poll-id`
+- **Endpoint:**  `/by-poll-id`
 
 - **Description:**  Retrieves a specific poll by its ID.
 
@@ -195,11 +238,16 @@ CREATE TABLE voting_item_options
 
   - `404 Not Found` – Poll with the specified ID not found.
 
-### 2.6) Delete a Poll
+---
+<br />
+
+
+
+#### 2.3.4) Delete a Poll
 
 - **Method:**  DELETE
 
-- **Endpoint:**  `/api/poll/by-poll-id`
+- **Endpoint:**  `/by-poll-id`
 
 - **Description:**  Deletes a specific poll by its ID.
 
@@ -219,11 +267,17 @@ CREATE TABLE voting_item_options
 
   - `404 Not Found` – Poll with the specified ID not found.
 
-### 2.7) Health Check
+---
+
+<br />
+
+
+
+### 2.3.5) Health Check
 
 - **Method:**  GET
 
-- **Endpoint:**  `/api/poll/health`
+- **Endpoint:**  `/health`
 
 - **Description:**  Checks the health of the service.
 
@@ -239,11 +293,17 @@ CREATE TABLE voting_item_options
 - **Response HTTP Status:**
   - `200 OK` – Service is healthy.
 
-### 2.8) Vote on Poll
+---
+
+<br />
+
+
+
+#### 2.3.6) Vote on Poll
 
 - **Method:**  PUT
 
-- **Endpoint:**  `/api/poll/vote`
+- **Endpoint:**  `/vote`
 
 - **Description:**  Updates the vote count for a specified voting item.
 
@@ -269,6 +329,11 @@ CREATE TABLE voting_item_options
 - **Response HTTP Status:**
   - `200 OK` – Vote count successfully updated.
 
+---
+<br />
+
+
+
 ## 3) Error Codes
 
 - `400 Bad Request` – The request could not be understood or was missing required parameters.
@@ -276,6 +341,10 @@ CREATE TABLE voting_item_options
 - `404 Not Found` – The specified resource could not be found.
 
 - `500 Internal Server Error` – An error occurred on the server.
+
+<br />
+
+
 
 ## 4) Notes
 
