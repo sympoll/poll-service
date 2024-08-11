@@ -2,6 +2,8 @@ package com.MTAPizza.Sympoll.pollmanagementservice.validator.exception;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,11 +20,14 @@ import java.util.Map;
 @ControllerAdvice
 public class PollExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(PollExceptionHandler.class);
+
     /**
      * Handles Illegal arguments exceptions only
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<IllegalPollArgumentError> handlePollValidationException(IllegalArgumentException ex, WebRequest request) {
+        log.info("Encountered a poll validation exception: {}", ex.getMessage());
         return new ResponseEntity<>(new IllegalPollArgumentError(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -31,6 +36,7 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralPollError> handleGeneralException(Exception ex, WebRequest request) {
+        log.info("Encountered a general poll exception: {}", ex.getMessage());
         return new ResponseEntity<>(new GeneralPollError(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
