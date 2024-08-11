@@ -31,6 +31,6 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralPollError> handleGeneralException(Exception ex, WebRequest request) {
-        return new ResponseEntity<>(new GeneralPollError(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new GeneralPollError(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
