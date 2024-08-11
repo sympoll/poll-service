@@ -32,15 +32,11 @@ The Poll Service is a RESTful API for creating, retrieving, and deleting polls. 
 
 ## 2) Architecture
 
----
-
 ### 2.1) Ports
 
 - **Service port:**  8082
 
 - **Database port:**  5432
-
----
 
 <br />
 
@@ -74,8 +70,6 @@ CREATE TABLE voting_item_options
     vote_count        INT
 );
 ```
-
----
 
 <br />
 
