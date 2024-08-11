@@ -2,8 +2,6 @@
 
 ## Table of Contents
 
-## Table of Contents
-
 1. [About](#1-about)
 2. [Architecture](#2-architecture)
   - [2.1 Ports](#21-ports)
