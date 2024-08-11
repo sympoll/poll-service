@@ -15,6 +15,7 @@
 3. [Error Codes](#3-error-codes)
 4. [Notes](#4-notes)
 
+
 ## 1) About
 
 The Poll Service is a RESTful API for creating, retrieving, and deleting polls. It manages poll data and interacts with the Vote Service to keep vote counts up to date.
