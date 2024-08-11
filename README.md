@@ -1,26 +1,21 @@
 # Poll Service
-
 ## Table of Contents
 
-## Table of Contents
-
-1. [About](#1-about)
-2. [Architecture](#2-architecture)
-  - [2.1 Ports](#21-ports)
-  - [2.2 Poll Management Service Schema](#22-poll-management-service-schema)
-  - [2.3 Endpoints](#23-endpoints)
-    - [2.3.1 Create a Poll](#231-create-a-poll)
-    - [2.3.2 Get All Polls](#232-get-all-polls)
-    - [2.3.3 Get Poll by ID](#233-get-poll-by-id)
-    - [2.3.4 Delete a Poll](#234-delete-a-poll)
-    - [2.3.5 Health Check](#235-health-check)
-    - [2.3.6 Vote on Poll](#236-vote-on-poll)
-3. [Error Codes](#3-error-codes)
-4. [Notes](#4-notes)
+[1. About](#1-about)   
+[2. Architecture](#2-architecture)   
+&emsp; [2.1 Ports](#21-ports)   
+&emsp; [2.2 Poll Management Service Schema](#22-poll-management-service-schema)   
+&emsp; [2.3 Endpoints](#23-endpoints)   
+&emsp; &emsp; [2.3.1 Create a Poll](#231-create-a-poll)   
+&emsp; &emsp; [2.3.2 Get All Polls](#232-get-all-polls)   
+&emsp; &emsp; [2.3.3 Get Poll by ID](#233-get-poll-by-id)   
+&emsp; &emsp; [2.3.4 Delete a Poll](#234-delete-a-poll)   
+&emsp; &emsp; [2.3.5 Health Check](#235-health-check)   
+&emsp; &emsp; [2.3.6 Vote on Poll](#236-vote-on-poll)   
+[3. Error Codes](#3-error-codes)   
+[4. Notes](#4-notes)   
 
 <br />
-
-
 
 ## 1) About
 
@@ -31,20 +26,14 @@ The Poll Service is a RESTful API for creating, retrieving, and deleting polls. 
 
 
 ## 2) Architecture
-
----
-
 ### 2.1) Ports
 
 - **Service port:**  8082
 
 - **Database port:**  5432
 
----
-
 <br />
-
-
+   
 
 ### 2.2) Poll Management Service Schema
 
@@ -75,12 +64,8 @@ CREATE TABLE voting_item_options
 );
 ```
 
----
-
 <br />
-
-
-
+   
 ### 2.3) Endpoints
 
 **BASE URL:** `/api/poll`.
@@ -89,11 +74,7 @@ All calls to this service must start with the base URL. Any additional URL field
 if relevant.
 
 ---
-
-<br />
-
-
-
+   
 #### 2.3.1) Create a poll
 
 - **Method:**  POST
@@ -155,9 +136,6 @@ if relevant.
   - `400 Bad Request` – Invalid input data.
 
 ---
-<br />
-
-
 
 #### 2.3.2) Get All Polls
 
@@ -197,9 +175,6 @@ if relevant.
   - `200 OK` – List of polls successfully retrieved.
 
 ---
-<br />
-
-
 
 #### 2.3.3) Get Poll by ID
 
@@ -242,9 +217,6 @@ if relevant.
   - `404 Not Found` – Poll with the specified ID not found.
 
 ---
-<br />
-
-
 
 #### 2.3.4) Delete a Poll
 
@@ -272,11 +244,7 @@ if relevant.
 
 ---
 
-<br />
-
-
-
-### 2.3.5) Health Check
+#### 2.3.5) Health Check
 
 - **Method:**  GET
 
@@ -297,10 +265,6 @@ if relevant.
   - `200 OK` – Service is healthy.
 
 ---
-
-<br />
-
-
 
 #### 2.3.6) Vote on Poll
 
@@ -332,7 +296,6 @@ if relevant.
 - **Response HTTP Status:**
   - `200 OK` – Vote count successfully updated.
 
----
 <br />
 
 
