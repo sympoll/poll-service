@@ -303,7 +303,7 @@ class PollManagementServiceApplicationTests {
      */
     @Test
     @Order(6)
-    void shouldCreateVotes(){
+    void shouldCastVotes(){
         String requestBody = String.format("""
                 {
                   "pollId": "%s",
@@ -312,14 +312,14 @@ class PollManagementServiceApplicationTests {
                 }
                 """, pollIdForVote, rndCreatorUUID, benzVoteId);
 
-        // Check that response is in fact 201
+        // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
                 .when()
                 .post("/api/poll/vote")
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .extract().response();
 
         VoteResponse voteResponse = response.as(VoteResponse.class);

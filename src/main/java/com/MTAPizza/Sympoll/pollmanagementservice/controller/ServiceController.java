@@ -3,7 +3,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCastRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
@@ -34,7 +34,7 @@ public class ServiceController {
     @ResponseStatus(HttpStatus.CREATED)
     public PollResponse createPoll(@RequestBody PollCreateRequest pollCreateRequest){
         log.info("Received request to create a poll");
-        log.debug("Poll received to create: {}", pollCreateRequest);
+        log.info("Poll received to create: {}", pollCreateRequest);
         return pollService.createPoll(pollCreateRequest);
     }
 
@@ -94,7 +94,7 @@ public class ServiceController {
     @ResponseStatus(HttpStatus.OK)
     public UUID deletePoll(@RequestParam UUID pollId){
         log.info("Received request to delete poll with ID {}", pollId);
-        log.debug("Poll ID received to delete: {}", pollId);
+        log.info("Poll ID received to delete: {}", pollId);
         return pollService.deletePoll(pollId);
     }
 
@@ -115,10 +115,10 @@ public class ServiceController {
      * @return The created vote for the Voting service.
      */
     @PostMapping("/vote")
-    @ResponseStatus(HttpStatus.CREATED)
-    public VoteResponse createVote(@RequestBody VoteCreateRequest createVoteRequest) {
-        log.info("Received request to create vote");
-        return votingItemService.createVote(createVoteRequest);
+    @ResponseStatus(HttpStatus.OK)
+    public VoteResponse castVote(@RequestBody VoteCastRequest createVoteRequest) {
+        log.info("Received request to cast vote");
+        return votingItemService.castVote(createVoteRequest);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ServiceController {
     @ResponseStatus(HttpStatus.OK)
     public UUID deleteVote(@RequestBody VoteDeleteRequest voteDeleteRequest) {
         log.info("Received request to delete vote");
-        log.debug("Vote ID received to be deleted: {}", voteDeleteRequest.voteId());
+        log.info("Vote ID received to be deleted: {}", voteDeleteRequest.voteId());
         return votingItemService.deleteVote(voteDeleteRequest);
     }
 }

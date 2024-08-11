@@ -1,6 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCastRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
@@ -20,17 +20,17 @@ public class VotingItemService {
 
     /**
      * Update a specific vote in the database.
-     * @param createVoteRequest Information of the vote to be created.
+     * @param voteCastRequest Information of the vote to be created.
      * @return The created vote for the Voting service.
      */
-    public VoteResponse createVote(VoteCreateRequest createVoteRequest) {
+    public VoteResponse castVote(VoteCastRequest voteCastRequest) {
         //TODO: validate vote request here.
 
-        VotingItem votingItem = votingItemRepository.getReferenceById(createVoteRequest.votingItemId());
+        VotingItem votingItem = votingItemRepository.getReferenceById(voteCastRequest.votingItemId());
         votingItem.setVoteCount(votingItem.getVoteCount() + 1);
         votingItemRepository.save(votingItem);
-        log.info("Voting item {} voted", createVoteRequest.votingItemId());
-        return new VoteResponse(createVoteRequest.userId(), createVoteRequest.votingItemId(), LocalDateTime.now());
+        log.info("Voting item {} voted", voteCastRequest.votingItemId());
+        return new VoteResponse(voteCastRequest.userId(), voteCastRequest.votingItemId(), LocalDateTime.now());
     }
 
     /**
