@@ -4,6 +4,9 @@
 
 The Poll Management Service is a RESTful API for creating, retrieving, and deleting polls.
 
+#### Service port: 8082
+#### DB port: 5432
+
 <br />   
    
 ## Base URL (for local testing)
