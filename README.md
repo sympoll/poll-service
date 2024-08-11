@@ -18,17 +18,13 @@
 3. [Error Codes](#3-error-codes)
 4. [Notes](#4-notes)
 
-<br />
-
-
+<br />   
 
 ## 1) About
 
 The Poll Service is a RESTful API for creating, retrieving, and deleting polls. It manages poll data and interacts with the Vote Service to keep vote counts up to date.
 
-<br />
-
-
+<br />   
 
 ## 2) Architecture
 
@@ -38,9 +34,7 @@ The Poll Service is a RESTful API for creating, retrieving, and deleting polls. 
 
 - **Database port:**  5432
 
-<br />
-
-
+<br />   
 
 ### 2.2) Poll Management Service Schema
 
@@ -71,9 +65,7 @@ CREATE TABLE voting_item_options
 );
 ```
 
-<br />
-
-
+<br />   
 
 ### 2.3) Endpoints
 
@@ -84,9 +76,7 @@ if relevant.
 
 ---
 
-<br />
-
-
+<br />   
 
 #### 2.3.1) Create a poll
 
@@ -149,9 +139,7 @@ if relevant.
   - `400 Bad Request` – Invalid input data.
 
 ---
-<br />
-
-
+<br />   
 
 #### 2.3.2) Get All Polls
 
@@ -191,9 +179,7 @@ if relevant.
   - `200 OK` – List of polls successfully retrieved.
 
 ---
-<br />
-
-
+<br />   
 
 #### 2.3.3) Get Poll by ID
 
@@ -236,9 +222,7 @@ if relevant.
   - `404 Not Found` – Poll with the specified ID not found.
 
 ---
-<br />
-
-
+<br />   
 
 #### 2.3.4) Delete a Poll
 
@@ -266,9 +250,7 @@ if relevant.
 
 ---
 
-<br />
-
-
+<br />   
 
 ### 2.3.5) Health Check
 
@@ -291,10 +273,7 @@ if relevant.
   - `200 OK` – Service is healthy.
 
 ---
-
-<br />
-
-
+<br />   
 
 #### 2.3.6) Vote on Poll
 
@@ -327,9 +306,8 @@ if relevant.
   - `200 OK` – Vote count successfully updated.
 
 ---
-<br />
 
-
+<br />   
 
 ## 3) Error Codes
 
@@ -339,9 +317,7 @@ if relevant.
 
 - `500 Internal Server Error` – An error occurred on the server.
 
-<br />
-
-
+<br />   
 
 ## 4) Notes
 
