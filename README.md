@@ -1,5 +1,20 @@
 # Poll Service
 
+## Table of Contents
+
+1. [About](#1-about)
+2. [Architecture](#2-architecture)
+  - [2.1 Ports](#21-ports)
+  - [2.2 Poll Management Service Schema](#22-poll-management-service-schema)
+  - [2.3 Create a Poll](#23-create-a-poll)
+  - [2.4 Get All Polls](#24-get-all-polls)
+  - [2.5 Get Poll by ID](#25-get-poll-by-id)
+  - [2.6 Delete a Poll](#26-delete-a-poll)
+  - [2.7 Health Check](#27-health-check)
+  - [2.8 Vote on Poll](#28-vote-on-poll)
+3. [Error Codes](#3-error-codes)
+4. [Notes](#4-notes)
+
 ## 1) About
 
 The Poll Service is a RESTful API for creating, retrieving, and deleting polls. It manages poll data and interacts with the Vote Service to keep vote counts up to date.
