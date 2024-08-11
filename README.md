@@ -72,9 +72,7 @@ CREATE TABLE voting_item_options
 All calls to this service must start with the base URL. Any additional URL fields will be specified
 if relevant.
 
----
-
-<br />   
+--- 
 
 #### 2.3.1) Create a poll
 
