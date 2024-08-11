@@ -2,16 +2,19 @@
 
 ## Table of Contents
 
+## Table of Contents
+
 1. [About](#1-about)
 2. [Architecture](#2-architecture)
   - [2.1 Ports](#21-ports)
   - [2.2 Poll Management Service Schema](#22-poll-management-service-schema)
-  - [2.3 Create a Poll](#23-create-a-poll)
-  - [2.4 Get All Polls](#24-get-all-polls)
-  - [2.5 Get Poll by ID](#25-get-poll-by-id)
-  - [2.6 Delete a Poll](#26-delete-a-poll)
-  - [2.7 Health Check](#27-health-check)
-  - [2.8 Vote on Poll](#28-vote-on-poll)
+  - [2.3 Endpoints](#23-endpoints)
+    - [2.3.1 Create a Poll](#231-create-a-poll)
+    - [2.3.2 Get All Polls](#232-get-all-polls)
+    - [2.3.3 Get Poll by ID](#233-get-poll-by-id)
+    - [2.3.4 Delete a Poll](#234-delete-a-poll)
+    - [2.3.5 Health Check](#235-health-check)
+    - [2.3.6 Vote on Poll](#236-vote-on-poll)
 3. [Error Codes](#3-error-codes)
 4. [Notes](#4-notes)
 
