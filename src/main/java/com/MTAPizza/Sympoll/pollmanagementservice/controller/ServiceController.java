@@ -3,9 +3,10 @@ package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item.VotingItemService;
 import lombok.RequiredArgsConstructor;
@@ -110,39 +111,26 @@ public class ServiceController {
     }
 
     /**
-     * Update a specific vote in the database.
-     * @param createVoteRequest Information of the vote to be created.
-     * @return The created vote for the Voting service.
+     * Update a specific vote (add or remove voting) in the database.
+     * @param voteRequest Information of the vote to be updated and the requested action.
+     * @return The voting item count and description.
      */
-    @PostMapping("/vote")
-    @ResponseStatus(HttpStatus.CREATED)
-    public VoteResponse createVote(@RequestBody VoteCreateRequest createVoteRequest) {
-        log.info("Received request to create vote");
-        return votingItemService.createVote(createVoteRequest);
+    @PutMapping("/vote")
+    @ResponseStatus(HttpStatus.OK)
+    public VoteResponse updateVotingItem(@RequestBody VoteRequest voteRequest) {
+        log.info("Received request to update voting item");
+        return votingItemService.updateVotingItem(voteRequest);
     }
 
     /**
      * Retrieve votes count of a specific vote.
-     * @param votingItemId Voting item ID of requested vote.
+     * @param voteCountRequest Voting item ID of requested vote.
      * @return Count of votes for the requested vote.
      */
     @GetMapping("/vote")
     @ResponseStatus(HttpStatus.OK)
-    public Integer getVoteCount(@RequestParam int votingItemId) {
+    public VoteCountResponse getVoteCount(@RequestBody VoteCountRequest voteCountRequest) {
         log.info("Received request to retrieve vote count");
-        return votingItemService.getVoteCount(votingItemId);
-    }
-
-    /**
-     * Update vote count decrement in the database.
-     * @param voteDeleteRequest Information of the vote to be deleted.
-     * @return The UUID of the vote that was deleted.
-     */
-    @DeleteMapping("/vote")
-    @ResponseStatus(HttpStatus.OK)
-    public UUID deleteVote(@RequestBody VoteDeleteRequest voteDeleteRequest) {
-        log.info("Received request to delete vote");
-        log.debug("Vote ID received to be deleted: {}", voteDeleteRequest.voteId());
-        return votingItemService.deleteVote(voteDeleteRequest);
+        return votingItemService.getVoteCount(voteCountRequest);
     }
 }

@@ -4,6 +4,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentE
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
@@ -303,30 +304,29 @@ class PollManagementServiceApplicationTests {
      */
     @Test
     @Order(6)
-    void shouldCreateVotes(){
+    void shouldAddVote(){
         String requestBody = String.format("""
                 {
-                  "pollId": "%s",
-                  "userId": "%s",
-                  "votingItemId": %d
+                  "votingItemId": %d,
+                  "action": "add"
                 }
-                """, pollIdForVote, rndCreatorUUID, benzVoteId);
+                """, benzVoteId);
 
-        // Check that response is in fact 201
+        // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
                 .when()
-                .post("/api/poll/vote")
+                .put("/api/poll/vote")
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .extract().response();
 
         VoteResponse voteResponse = response.as(VoteResponse.class);
 
         /* Verify vote response */
-        assertEquals(rndCreatorUUID, voteResponse.userId());
-        assertEquals(benzVoteId, voteResponse.votingItemId());
+        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
+        assertEquals(1, voteResponse.voteCount(), "Expected 1 vote count");
     }
 
     /**
@@ -335,20 +335,26 @@ class PollManagementServiceApplicationTests {
     @Test
     @Order(7)
     void shouldGetVoteCount() {
+        String requestBody = String.format("""
+                {
+                  "votingItemId": %d
+                }
+                """, benzVoteId);
+
         // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
-                .queryParam("votingItemId", benzVoteId)
+                .body(requestBody)
                 .when()
                 .get("/api/poll/vote")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        int voteCountResponse = response.as(Integer.class);
+        VoteCountResponse voteCountResponse = response.as(VoteCountResponse.class);
 
         /* Verify vote count */
-        assertEquals(1, voteCountResponse, "Expected 1 vote count");
+        assertEquals(1, voteCountResponse.voteCount(), "Expected 1 vote count");
     }
 
     /**
@@ -360,38 +366,26 @@ class PollManagementServiceApplicationTests {
         // For this test 'voteId' argument is irrelevant. So, the test sends 'pollIdForVote' as a placeholder for this UUID.
         String requestBodyDelete = String.format("""
                 {
-                  "voteId": "%s",
-                  "votingItemId": %d
+                  "votingItemId": %d,
+                  "action": "remove"
                 }
-                """, pollIdForVote, benzVoteId);
-
-        // Check that response is in fact 200
-        Response responseDelete = RestAssured.given()
-                .contentType("application/json")
-                .body(requestBodyDelete)
-                .when()
-                .delete("/api/poll/vote")
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        UUID voteIdResponse = responseDelete.as(UUID.class);
+                """, benzVoteId);
 
         // Check that response is in fact 200
         Response response = RestAssured.given()
                 .contentType("application/json")
-                .queryParam("votingItemId", benzVoteId)
+                .body(requestBodyDelete)
                 .when()
-                .get("/api/poll/vote")
+                .put("/api/poll/vote")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        int voteCountResponse = response.as(Integer.class);
+        VoteResponse voteResponse = response.as(VoteResponse.class);
 
         /* Verify vote count */
-        assertNotNull(voteIdResponse);
-        assertEquals(0, voteCountResponse, "Expected 0 vote count");
+        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
+        assertEquals(0, voteResponse.voteCount(), "Expected 0 vote count");
 
     }
 }

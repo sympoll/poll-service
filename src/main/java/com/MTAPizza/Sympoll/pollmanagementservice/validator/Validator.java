@@ -1,12 +1,11 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.validator;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCreateRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.delete.VoteDeleteRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
-import com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item.VotingItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.UUID;
 
 /**
  * This class handles the validation of data received from the client.
@@ -50,36 +48,38 @@ public class Validator {
         }
     }
 
-    public void validateNewVote(VoteCreateRequest voteCreateRequest) throws IllegalArgumentException{
-        validatePollIdExists(voteCreateRequest.pollId());
-        // TODO: validate user id
-        validateVotingItemIdExists(voteCreateRequest.votingItemId());
+    public void validatVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
+        validateVotingItemIdExists(voteRequest.votingItemId());
+        validateVoteAction(voteRequest.action());
+        validateDeleteVote(voteRequest);
+
     }
 
-
-    private void validatePollIdExists(UUID pollId) {
-        if(!pollRepository.existsById(pollId)) {
-            log.warn("Client tried to vote in a poll that does not exist.");
-            throw new IllegalArgumentException("Poll with id " + pollId + " does not exist");
-        }
-    }
-
-    public void validateVotingItemIdExists(int votingItemId) {
+    private void validateVotingItemIdExists(int votingItemId) {
         if(!votingItemRepository.existsById(votingItemId)) {
             log.warn("Client tried to vote for an answer that does not exist.");
             throw new IllegalArgumentException("Vote with id " + votingItemId + " does not exist");
         }
     }
 
-    public void validateDeleteVote(VoteDeleteRequest voteDeleteRequest) throws IllegalArgumentException{
-        validateVotingItemIdExists(voteDeleteRequest.votingItemId());
-        validateVotingCountGreaterThanZero(votingItemRepository.getReferenceById(voteDeleteRequest.votingItemId()).getVoteCount());
+    private void validateVoteAction(String action) {
+        if(!action.equals("add") && !action.equals("remove")) {
+            log.warn("Client tried to request an action that does not exist.");
+            throw new IllegalArgumentException("Action " + action + " does not exist");
+        }
     }
 
-    private void validateVotingCountGreaterThanZero(int votingCount) {
-        if(votingCount <= 0) {
-            log.warn("Client tried to delete vote from a vote with 0 vote count.");
-            throw new IllegalArgumentException("Can not delete vote from voting item with 0 vote count");
+    private void validateDeleteVote(VoteRequest voteRequest) throws IllegalArgumentException{
+        if(VoteAction.REMOVE.name().equalsIgnoreCase(voteRequest.action())) {
+            int voteCount = votingItemRepository.getReferenceById(voteRequest.votingItemId()).getVoteCount();
+            if(voteCount <= 0) {
+                log.warn("Client tried to remove vote from a vote with 0 vote count.");
+                throw new IllegalArgumentException("Can not remove vote from voting item with 0 vote count");
+            }
         }
+    }
+
+    public void validateVoteCountRequest(VoteCountRequest voteCountRequest) throws IllegalArgumentException {
+        validateVotingItemIdExists(voteCountRequest.votingItemId());
     }
 }
