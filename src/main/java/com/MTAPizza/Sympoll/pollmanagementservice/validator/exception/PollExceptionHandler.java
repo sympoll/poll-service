@@ -4,6 +4,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,6 +32,6 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralPollError> handleGeneralException(Exception ex, WebRequest request) {
-        return new ResponseEntity<>(new GeneralPollError(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new GeneralPollError(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
