@@ -74,7 +74,6 @@ public class Poll implements Comparable<Poll>{
                         .sorted(Comparator.comparing(VotingItem::getVotingItemId))
                         .map(votingItem -> new VotingItemResponse(
                         votingItem.getVotingItemId(),
-                        votingItem.getVotingItemOrdinal(),
                         votingItem.getDescription(),
                         votingItem.getVoteCount()
                 )).toList());

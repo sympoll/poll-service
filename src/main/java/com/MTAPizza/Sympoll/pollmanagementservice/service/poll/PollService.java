@@ -59,7 +59,6 @@ public class PollService {
             VotingItem newVotingItem = new VotingItem();
             newVotingItem.setPollId(pollId);
             newVotingItem.setDescription(votingItem);
-            newVotingItem.setVotingItemOrdinal(ord++);
             newVotingItem.setVoteCount(0);
             resVotingItems.add(newVotingItem);
         }

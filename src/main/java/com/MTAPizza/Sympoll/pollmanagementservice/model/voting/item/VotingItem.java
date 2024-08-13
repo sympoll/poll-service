@@ -20,9 +20,6 @@ public class VotingItem {
     @Column(name = "poll_id")
     private UUID pollId;
 
-    @Column(name = "ordinal")
-    private int votingItemOrdinal;
-
     @Column(name = "description")
     private String description;
 
