@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This class handles the validation of data received from the client.
@@ -28,6 +30,28 @@ public class Validator {
     public void validateNewPoll(PollCreateRequest poll) throws IllegalArgumentException{
         validateAllowedVotingItems(poll.votingItems().size(), poll);
         validateDeadline(LocalDateTime.now(), poll);
+        validateGroupIdExist(poll.groupId());
+        validateUserIdExist(poll.creatorId());
+        validateVotingItemsStringList(poll);
+    }
+
+    public void validateGetPollByIdRequest(UUID pollId) {
+        validatePollIdExist(pollId);
+    }
+
+    public void validateGetPollsByGroupIdRequest(String groupId) {
+        validateGroupIdExist(groupId);
+    }
+
+    public void validateGetPollsByMultipleGroupIdsRequest(List<String> groupIds) {
+        for (String groupId : groupIds) {
+            validateGroupIdExist(groupId);
+        }
+    }
+
+    public void validateDeletePollRequest(UUID pollId) {
+        // TODO: the server will receive also the userId and verify if this user has permission to delete this poll
+        validatePollIdExist(pollId);
     }
 
     private void validateAllowedVotingItems(int nofVotingItems, PollCreateRequest poll) {
@@ -48,11 +72,37 @@ public class Validator {
         }
     }
 
+    private void validateUserIdExist(UUID userId) {
+        //TODO: send request to the user service
+    }
+
+    private void validateVotingItemsStringList(PollCreateRequest poll) {
+        if(poll.votingItems() == null || poll.votingItems().isEmpty()){
+            log.warn("User {} tried to create a poll without voting item list", poll.creatorId());
+            throw new  IllegalArgumentException("A list of voting items cannot be empty");
+        }
+    }
+
+    private void validatePollIdExist(UUID pollId) {
+        if(!pollRepository.existsById(pollId)) {
+            log.warn("User tried to interact with a poll that does not exist.");
+            throw new IllegalArgumentException("Poll with id " + pollId + " does not exist");
+        }
+    }
+
+    private void validateGroupIdExist(String groupId) {
+        //TODO: send request to the group service
+    }
+
     public void validatVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
         validateVotingItemIdExists(voteRequest.votingItemId());
         validateVoteAction(voteRequest.action());
         validateDeleteVote(voteRequest);
 
+    }
+
+    public void validateVoteCountRequest(VoteCountRequest voteCountRequest) throws IllegalArgumentException {
+        validateVotingItemIdExists(voteCountRequest.votingItemId());
     }
 
     private void validateVotingItemIdExists(int votingItemId) {
@@ -77,9 +127,5 @@ public class Validator {
                 throw new IllegalArgumentException("Can not remove vote from voting item with 0 vote count");
             }
         }
-    }
-
-    public void validateVoteCountRequest(VoteCountRequest voteCountRequest) throws IllegalArgumentException {
-        validateVotingItemIdExists(voteCountRequest.votingItemId());
     }
 }
