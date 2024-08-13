@@ -1,6 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
@@ -238,7 +238,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("A deadline cannot be earlier than the time a poll was created", errorResponse.message());
     }
@@ -262,7 +262,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("Number of allowed answers is greater than number of available answers", errorResponse.message());
     }
@@ -295,7 +295,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
 
         // Verify the response code
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
     }
 
