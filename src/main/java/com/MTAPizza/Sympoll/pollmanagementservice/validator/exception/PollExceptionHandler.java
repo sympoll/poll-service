@@ -3,7 +3,6 @@ package com.MTAPizza.Sympoll.pollmanagementservice.validator.exception;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.JsonParserError;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,6 +34,7 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<JsonParserError> handleInvalidJsonException(HttpMessageNotReadableException ex, WebRequest request) {
+        log.info("Encountered a request body without valid JSON format: {}", ex.getMessage());
         return new ResponseEntity<>(new JsonParserError(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
