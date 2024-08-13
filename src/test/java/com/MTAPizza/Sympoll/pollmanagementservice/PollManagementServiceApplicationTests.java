@@ -1,14 +1,18 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -27,7 +31,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
+    private static final Logger log = LoggerFactory.getLogger(PollManagementServiceApplicationTests.class);
     private static UUID pollId;
+    private static UUID pollIdForVote;
+    private static int benzVoteId;
     private static final Gson gson;
     private static final UUID rndCreatorUUID = UUID.randomUUID();
 
@@ -146,6 +153,8 @@ class PollManagementServiceApplicationTests {
         /* Verify poll response */
         assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
         pollId = pollResponses.get(0).pollId();
+        pollIdForVote = pollResponses.get(1).pollId();
+        benzVoteId = pollResponses.get(1).votingItems().get(0).votingItemId();
     }
 
 
@@ -229,7 +238,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("A deadline cannot be earlier than the time a poll was created", errorResponse.message());
     }
@@ -253,7 +262,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("Number of allowed answers is greater than number of available answers", errorResponse.message());
     }
@@ -286,7 +295,97 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
 
         // Verify the response code
-        IllegalPollArgumentError errorResponse = response.as(IllegalPollArgumentError.class);
+        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
         assertNotNull(errorResponse, "Error response should not be null");
+    }
+
+    /**
+     * Send request to create vote for 'Benz Brothers' in the second poll.
+     */
+    @Test
+    @Order(6)
+    void shouldAddVote(){
+        String requestBody = String.format("""
+                {
+                  "votingItemId": %d,
+                  "action": "add"
+                }
+                """, benzVoteId);
+
+        // Check that response is in fact 200
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .put("/api/poll/vote")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        VoteResponse voteResponse = response.as(VoteResponse.class);
+
+        /* Verify vote response */
+        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
+        assertEquals(1, voteResponse.voteCount(), "Expected 1 vote count");
+    }
+
+    /**
+     * Send request to verify the vote count of 'Benz Brothers' in the second poll.
+     */
+    @Test
+    @Order(7)
+    void shouldGetVoteCount() {
+        String requestBody = String.format("""
+                {
+                  "votingItemId": %d
+                }
+                """, benzVoteId);
+
+        // Check that response is in fact 200
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .get("/api/poll/vote")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        VoteCountResponse voteCountResponse = response.as(VoteCountResponse.class);
+
+        /* Verify vote count */
+        assertEquals(1, voteCountResponse.voteCount(), "Expected 1 vote count");
+    }
+
+    /**
+     * Send request to delete the vote for 'Benz Brothers' in the second poll.
+     */
+    @Test
+    @Order(8)
+    void shouldDeleteVote() {
+        // For this test 'voteId' argument is irrelevant. So, the test sends 'pollIdForVote' as a placeholder for this UUID.
+        String requestBodyDelete = String.format("""
+                {
+                  "votingItemId": %d,
+                  "action": "remove"
+                }
+                """, benzVoteId);
+
+        // Check that response is in fact 200
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .body(requestBodyDelete)
+                .when()
+                .put("/api/poll/vote")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        VoteResponse voteResponse = response.as(VoteResponse.class);
+
+        /* Verify vote count */
+        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
+        assertEquals(0, voteResponse.voteCount(), "Expected 0 vote count");
+
     }
 }
