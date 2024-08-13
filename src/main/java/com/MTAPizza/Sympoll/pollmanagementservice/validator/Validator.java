@@ -1,6 +1,8 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.validator;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserIdExistsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
@@ -8,6 +10,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class Validator {
     private final PollRepository pollRepository;
     private final VotingItemRepository votingItemRepository;
+    private final UserClient userClient;
 
     public void validateNewPoll(PollCreateRequest poll) throws IllegalArgumentException{
         validateAllowedVotingItems(poll.votingItems().size(), poll);
@@ -74,6 +78,17 @@ public class Validator {
 
     private void validateUserIdExist(UUID userId) {
         //TODO: send request to the user service
+        UserIdExistsRequest requestBody = new UserIdExistsRequest(userId);
+        ResponseEntity<String> response = userClient.checkUserIdExists(requestBody);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            if(response.getBody().equals("false")){
+                log.warn("User {} does not exists.", userId);
+                throw new IllegalArgumentException("User " + userId + " does not exist");
+            }
+
+            log.info("User ID check completed");
+        }
     }
 
     private void validateVotingItemsStringList(PollCreateRequest poll) {

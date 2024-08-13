@@ -5,7 +5,9 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.stub.UserClientStub;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -24,9 +27,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.List;
 import java.util.UUID;
 
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(port = 8081) // WireMock runs on port 8081
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(PollExceptionHandler.class)
@@ -53,13 +59,14 @@ class PollManagementServiceApplicationTests {
     void setup() {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
+        WireMock.reset();
+        UserClientStub.stabUserIdExists();
     }
 
     static {
         postgreSQLContainer.start(); //  Run mock test container.
         gson = new Gson();
     }
-
 
     /**
      * Send request to create the specified poll.
