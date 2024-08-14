@@ -225,8 +225,14 @@ if relevant.
 
 - **Description:**  Deletes a specific poll by its ID.
 
-- **Query Parameters:**
-  - `pollId` (UUID) – The ID of the poll to delete.
+- **Request Body:**
+ ```json
+{
+    "pollId": "uuid",
+    "userId": "uuid",
+    "groupId": "string"
+}
+```
 
 - **Response:**
 
