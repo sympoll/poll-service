@@ -3,7 +3,6 @@ package com.MTAPizza.Sympoll.pollmanagementservice.validator.exception;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.JsonParserError;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalPollArgumentError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
