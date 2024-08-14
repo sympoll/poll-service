@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.voting.item.VotingItemResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,4 +24,13 @@ public class VotingItem {
 
     @Column(name = "vote_count")
     private int voteCount;
+
+    public VotingItemResponse toVotingItemResponse() {
+        return new VotingItemResponse(
+                votingItemId,
+                votingItemOrdinal,
+                description,
+                voteCount
+        );
+    }
 }
