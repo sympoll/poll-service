@@ -3,8 +3,10 @@ package com.MTAPizza.Sympoll.pollmanagementservice;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.stub.GroupClientStub;
 import com.MTAPizza.Sympoll.pollmanagementservice.stub.UserClientStub;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -27,8 +29,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.List;
 import java.util.UUID;
 
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,7 +60,8 @@ class PollManagementServiceApplicationTests {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
         WireMock.reset();
-        UserClientStub.stabUserIdExists();
+        UserClientStub.initStubs();
+        GroupClientStub.initStubs();
     }
 
     static {
@@ -187,9 +188,17 @@ class PollManagementServiceApplicationTests {
     @Test
     @Order(4)
     void shouldDeletePoll() {
+        String requestBody = String.format("""
+                {
+                  "userId": "%s",
+                  "pollId": "%s",
+                  "groupId": "123"
+                }
+                """, rndCreatorUUID, pollId);
+
         // Check that response is in fact 200
         Response responseDelete = RestAssured.given()
-                .queryParam("pollId", pollId)
+                .body(requestBody)
                 .contentType("application/json")
                 .when()
                 .delete("/api/poll/by-poll-id")
@@ -197,7 +206,7 @@ class PollManagementServiceApplicationTests {
                 .statusCode(200)
                 .extract().response();
 
-        UUID pollIdResponse = responseDelete.as(UUID.class);
+        PollDeleteResponse pollDeleteResponse = responseDelete.as(PollDeleteResponse.class);
 
         // Check that response is in fact 200
         Response responseAll = RestAssured.given()
@@ -210,7 +219,7 @@ class PollManagementServiceApplicationTests {
 
         List<PollResponse> pollResponses = responseAll.as(new TypeRef<>() {});
         /* Verify poll response */
-        assertNotNull(pollIdResponse, "Poll ID should not be null");
+        assertNotNull(pollDeleteResponse.pollId(), "Poll ID should not be null");
         assertEquals(1, pollResponses.size(), "Expected 1 Polls in the response");
     }
 
@@ -393,6 +402,5 @@ class PollManagementServiceApplicationTests {
         /* Verify vote count */
         assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
         assertEquals(0, voteResponse.voteCount(), "Expected 0 vote count");
-
     }
 }

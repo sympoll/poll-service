@@ -1,8 +1,15 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.validator;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserIdExistsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.permission.UserHasPermissionRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.permission.UserHasPermissionResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
@@ -13,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.security.Permission;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,6 +38,7 @@ public class Validator {
     private final PollRepository pollRepository;
     private final VotingItemRepository votingItemRepository;
     private final UserClient userClient;
+    private final GroupClient groupClient;
 
     public void validateNewPoll(PollCreateRequest poll) throws IllegalArgumentException{
         validateAllowedVotingItems(poll.votingItems().size(), poll);
@@ -53,9 +62,9 @@ public class Validator {
         }
     }
 
-    public void validateDeletePollRequest(UUID pollId) {
-        // TODO: the server will receive also the userId and verify if this user has permission to delete this poll
-        validatePollIdExist(pollId);
+    public void validateDeletePollRequest(PollDeleteRequest pollDeleteRequest) {
+        validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId());
+        validatePollIdExist(pollDeleteRequest.pollId());
     }
 
     private void validateAllowedVotingItems(int nofVotingItems, PollCreateRequest poll) {
@@ -77,17 +86,14 @@ public class Validator {
     }
 
     private void validateUserIdExist(UUID userId) {
-        //TODO: send request to the user service
         UserIdExistsRequest requestBody = new UserIdExistsRequest(userId);
-        ResponseEntity<String> response = userClient.checkUserIdExists(requestBody);
+        ResponseEntity<UserIdExistsResponse> response = userClient.checkUserIdExists(requestBody);
 
         if (response.getStatusCode().is2xxSuccessful()) {
-            if(response.getBody().equals("false")){
+            if(!response.getBody().isExists()){
                 log.warn("User {} does not exists.", userId);
                 throw new IllegalArgumentException("User " + userId + " does not exist");
             }
-
-            log.info("User ID check completed");
         }
     }
 
@@ -106,7 +112,27 @@ public class Validator {
     }
 
     private void validateGroupIdExist(String groupId) {
-        //TODO: send request to the group service
+        GroupIdExistsRequest requestBody = new GroupIdExistsRequest(groupId);
+        ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(requestBody);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            if(!response.getBody().isExists()){
+                log.warn("Group {} does not exists.", groupId);
+                throw new IllegalArgumentException("Group " + groupId + " does not exist");
+            }
+        }
+    }
+
+    private void validateUserHasPermissions(UUID userId, String groupId) {
+        UserHasPermissionRequest requestBody = new UserHasPermissionRequest(userId, groupId);
+        ResponseEntity<UserHasPermissionResponse> response = userClient.checkHasPermissionExists(requestBody);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            if(!response.getBody().hasPermission()){
+                log.warn("User {} does not has permission to delete this poll.", userId);
+                throw new IllegalArgumentException("User " + userId + " does not has permission to delete this poll");
+            }
+        }
     }
 
     public void validatVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{

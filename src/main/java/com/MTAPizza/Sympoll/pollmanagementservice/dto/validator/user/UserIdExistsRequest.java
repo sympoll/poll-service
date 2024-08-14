@@ -1,4 +1,4 @@
-package com.MTAPizza.Sympoll.pollmanagementservice.dto.user;
+package com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user;
 
 import java.util.UUID;
 

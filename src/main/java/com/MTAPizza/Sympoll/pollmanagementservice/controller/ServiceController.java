@@ -3,6 +3,8 @@ package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
@@ -88,15 +90,15 @@ public class ServiceController {
 
     /**
      * Delete a poll from the database, by its ID.
-     * @param pollId ID of the Poll to delete.
+     * @param pollDeleteRequest ID of the Poll to delete and the ID of the user.
      * @return The ID of the poll that was deleted.
      */
     @DeleteMapping("/by-poll-id")
     @ResponseStatus(HttpStatus.OK)
-    public UUID deletePoll(@RequestParam UUID pollId){
-        log.info("Received request to delete poll with ID {}", pollId);
-        log.debug("Poll ID received to delete: {}", pollId);
-        return pollService.deletePoll(pollId);
+    public PollDeleteResponse deletePoll(@RequestBody PollDeleteRequest pollDeleteRequest){
+        log.info("Received request to delete poll with ID {}", pollDeleteRequest.pollId());
+        log.debug("Poll ID received to delete: {}", pollDeleteRequest.pollId());
+        return pollService.deletePoll(pollDeleteRequest);
     }
 
     /**
