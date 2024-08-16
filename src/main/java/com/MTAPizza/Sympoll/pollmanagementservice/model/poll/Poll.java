@@ -59,24 +59,17 @@ public class Poll implements Comparable<Poll>{
      */
     public PollResponse toPollResponse(){
         return new PollResponse(
-                this.getPollId(),
-                this.getTitle(),
-                this.getDescription(),
-                this.getNofAnswersAllowed(),
-                this.getCreatorId(),
-                this.getGroupId(),
-                this.getTimeCreated(),
-                this.getTimeUpdated(),
-                this.getDeadline(),
-
-                /* Convert Answers to answer responses */
-                this.getVotingItems().stream()
-                        .sorted(Comparator.comparing(VotingItem::getVotingItemId))
-                        .map(votingItem -> new VotingItemResponse(
-                        votingItem.getVotingItemId(),
-                        votingItem.getDescription(),
-                        votingItem.getVoteCount()
-                )).toList());
+                pollId,
+                title,
+                description,
+                nofAnswersAllowed,
+                creatorId,
+                groupId,
+                timeCreated,
+                timeUpdated,
+                deadline,
+                votingItems.stream().map(VotingItem::toVotingItemResponse).toList() // Convert votingItems to VotingItemResponse objects
+        );
     }
 
     /**
