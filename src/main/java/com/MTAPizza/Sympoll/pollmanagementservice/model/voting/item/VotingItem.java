@@ -30,7 +30,6 @@ public class VotingItem {
     public VotingItemResponse toVotingItemResponse() {
         return new VotingItemResponse(
                 votingItemId,
-                votingItemOrdinal,
                 description,
                 voteCount
         );
