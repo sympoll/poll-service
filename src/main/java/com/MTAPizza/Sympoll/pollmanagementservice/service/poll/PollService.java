@@ -2,6 +2,8 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @Slf4j
 public class PollService {
     private final PollRepository pollRepository;
+    private final Validator validator;
 
     /**
      * Create and add a poll to the database.
@@ -29,7 +32,7 @@ public class PollService {
      * @return The poll that was added to the database.
      */
     public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
-        Validator.validateNewPoll(pollCreateRequest);
+        validator.validateNewPoll(pollCreateRequest);
 
         Poll poll = Poll.builder()
                 .title(pollCreateRequest.title())
@@ -38,27 +41,26 @@ public class PollService {
                 .creatorId(pollCreateRequest.creatorId())
                 .groupId(pollCreateRequest.groupId())
                 .deadline(convertToDate(pollCreateRequest.deadline()))
-                .votingItems(convertVotingItemsToModel(pollCreateRequest.votingItems()))
                 .build();
+        poll.setVotingItems(convertVotingItemsToModel(pollCreateRequest.votingItems(), poll.getPollId()));
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
         return poll.toPollResponse();
     }
 
-
     /**
      * Converts a list of voting items strings into a list of Answer entities.
      * @param votingItems List of voting items strings to be converted.
      * @return List of voting items entities.
      */
-    private List<VotingItem> convertVotingItemsToModel(List<String> votingItems) {
+    private List<VotingItem> convertVotingItemsToModel(List<String> votingItems, UUID pollId) {
         List<VotingItem> resVotingItems = new ArrayList<>();
         int ord = 0;
         for (String votingItem : votingItems) {
             VotingItem newVotingItem = new VotingItem();
+            newVotingItem.setPollId(pollId);
             newVotingItem.setDescription(votingItem);
-            newVotingItem.setVotingItemOrdinal(ord++);
             newVotingItem.setVoteCount(0);
             resVotingItems.add(newVotingItem);
         }
@@ -91,14 +93,16 @@ public class PollService {
 
     /**
      * Delete a poll from the database.
-     * @param pollId ID of the poll to delete.
+     * @param pollDeleteRequest ID of the poll to delete and the ID of the user.
      * @return the ID of the poll deleted.
      */
-    public UUID deletePoll(UUID pollId) {
-        log.info("Deleting poll with ID: {}", pollId);
-        pollRepository.deleteById(pollId);
-        log.info("POLL: {} was deleted.", pollId);
-        return pollId;
+    public PollDeleteResponse deletePoll(PollDeleteRequest pollDeleteRequest) {
+        validator.validateDeletePollRequest(pollDeleteRequest);
+
+        log.info("Deleting poll with ID: {}", pollDeleteRequest.pollId());
+        pollRepository.deleteById(pollDeleteRequest.pollId());
+        log.info("POLL: {} was deleted.", pollDeleteRequest.pollId());
+        return new PollDeleteResponse(pollDeleteRequest.pollId());
     }
 
     /**
@@ -107,6 +111,8 @@ public class PollService {
      * @return The retrieved poll's details.
      */
     public PollResponse getPollById(UUID pollId) {
+        validator.validateGetPollByIdRequest(pollId);
+
         log.info("Retrieving poll with ID: {}", pollId);
         return pollRepository.getReferenceById(pollId).toPollResponse();
     }
@@ -116,6 +122,8 @@ public class PollService {
      * Sorted by creation date, newest first.
      */
     public List<PollResponse> getPollsByGroupId(String groupId) {
+        validator.validateGetPollsByGroupIdRequest(groupId);
+
         log.info("Retrieving all polls by group ID: {}", groupId);
         return pollRepository
                 .findAll()
@@ -131,6 +139,8 @@ public class PollService {
      * Sorted by creation date, newest first.
      */
     public List<PollResponse> getPollsByMultipleGroupIds(List<String> groupIds) {
+        validator.validateGetPollsByMultipleGroupIdsRequest(groupIds);
+
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
         List<Poll> resPolls = new ArrayList<>();
         for(String groupId : groupIds) {

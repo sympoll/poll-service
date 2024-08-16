@@ -3,7 +3,14 @@ package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
+import com.MTAPizza.Sympoll.pollmanagementservice.service.voting.item.VotingItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +26,7 @@ import java.util.UUID;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ServiceController {
     private final PollService pollService;
+    private final VotingItemService votingItemService;
 
     /**
      * Create a new poll to save in the database.
@@ -82,15 +90,15 @@ public class ServiceController {
 
     /**
      * Delete a poll from the database, by its ID.
-     * @param pollId ID of the Poll to delete.
+     * @param pollDeleteRequest ID of the Poll to delete and the ID of the user.
      * @return The ID of the poll that was deleted.
      */
     @DeleteMapping("/by-poll-id")
     @ResponseStatus(HttpStatus.OK)
-    public UUID deletePoll(@RequestParam UUID pollId){
-        log.info("Received request to delete poll with ID {}", pollId);
-        log.debug("Poll ID received to delete: {}", pollId);
-        return pollService.deletePoll(pollId);
+    public PollDeleteResponse deletePoll(@RequestBody PollDeleteRequest pollDeleteRequest){
+        log.info("Received request to delete poll with ID {}", pollDeleteRequest.pollId());
+        log.debug("Poll ID received to delete: {}", pollDeleteRequest.pollId());
+        return pollService.deletePoll(pollDeleteRequest);
     }
 
     /**
@@ -102,5 +110,29 @@ public class ServiceController {
     public HealthResponse HealthCheck(){
         log.info("Received health check request, returning OK");
         return new HealthResponse("Running", "Poll Management Service is up and running.");
+    }
+
+    /**
+     * Update a specific vote (add or remove voting) in the database.
+     * @param voteRequest Information of the vote to be updated and the requested action.
+     * @return The voting item count and description.
+     */
+    @PutMapping("/vote")
+    @ResponseStatus(HttpStatus.OK)
+    public VoteResponse updateVotingItem(@RequestBody VoteRequest voteRequest) {
+        log.info("Received request to update voting item");
+        return votingItemService.updateVotingItem(voteRequest);
+    }
+
+    /**
+     * Retrieve votes count of a specific vote.
+     * @param voteCountRequest Voting item ID of requested vote.
+     * @return Count of votes for the requested vote.
+     */
+    @GetMapping("/vote")
+    @ResponseStatus(HttpStatus.OK)
+    public VoteCountResponse getVoteCount(@RequestBody VoteCountRequest voteCountRequest) {
+        log.info("Received request to retrieve vote count");
+        return votingItemService.getVoteCount(voteCountRequest);
     }
 }
