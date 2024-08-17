@@ -142,6 +142,8 @@ public class PollService {
         validator.validateGetPollsByMultipleGroupIdsRequest(groupIds);
 
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
+
+        log.info("All polls in db: {}", pollRepository.findAll().toString());
         List<Poll> resPolls = new ArrayList<>();
         for(String groupId : groupIds) {
             resPolls.addAll(
