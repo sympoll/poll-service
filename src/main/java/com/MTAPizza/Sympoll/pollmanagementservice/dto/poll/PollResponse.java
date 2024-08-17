@@ -23,3 +23,4 @@ public record PollResponse(
         List<VotingItemResponse> votingItems
 ) {
 }
+
