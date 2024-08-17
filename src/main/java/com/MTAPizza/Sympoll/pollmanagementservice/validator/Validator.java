@@ -4,7 +4,6 @@ import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsResponse;
@@ -112,8 +111,7 @@ public class Validator {
     }
 
     private void validateGroupIdExist(String groupId) {
-        GroupIdExistsRequest requestBody = new GroupIdExistsRequest(groupId);
-        ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(requestBody);
+        ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(groupId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
