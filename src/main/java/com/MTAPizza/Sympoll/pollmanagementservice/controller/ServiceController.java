@@ -37,7 +37,7 @@ public class ServiceController {
     @ResponseStatus(HttpStatus.CREATED)
     public PollResponse createPoll(@RequestBody PollCreateRequest pollCreateRequest){
         log.info("Received request to create a poll");
-        log.debug("Poll received to create: {}", pollCreateRequest);
+        log.info("Poll received to create: {}", pollCreateRequest);
         return pollService.createPoll(pollCreateRequest);
     }
 
@@ -113,9 +113,9 @@ public class ServiceController {
     }
 
     /**
-     * Update a specific vote (add or remove voting) in the database.
-     * @param voteRequest Information of the vote to be updated and the requested action.
-     * @return The voting item count and description.
+     * Update a specific vote in the database.
+     * @param voteRequest Information of the vote to be created.
+     * @return The created vote for the Voting service.
      */
     @PutMapping("/vote")
     @ResponseStatus(HttpStatus.OK)
