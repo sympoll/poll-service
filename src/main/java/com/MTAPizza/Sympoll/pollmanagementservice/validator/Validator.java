@@ -62,7 +62,7 @@ public class Validator {
     }
 
     public void validateDeletePollRequest(PollDeleteRequest pollDeleteRequest) {
-        validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId());
+        //validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId());
         validatePollIdExist(pollDeleteRequest.pollId());
     }
 
@@ -122,6 +122,7 @@ public class Validator {
     }
 
     private void validateUserHasPermissions(UUID userId, String groupId) {
+        // TODO: change this validation to send request to group service
         UserHasPermissionRequest requestBody = new UserHasPermissionRequest(userId, groupId);
         ResponseEntity<UserHasPermissionResponse> response = userClient.checkHasPermissionExists(requestBody);
 
