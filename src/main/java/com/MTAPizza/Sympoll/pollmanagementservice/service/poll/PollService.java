@@ -151,6 +151,8 @@ public class PollService {
                         .filter(poll -> poll.getGroupId().equals(groupId))
                         .toList());
         }
+
+        log.info("Created polls: {}", resPolls.toString());
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
