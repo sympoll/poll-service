@@ -6,7 +6,6 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteCastRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
@@ -115,7 +114,7 @@ public class ServiceController {
 
     /**
      * Update a specific vote in the database.
-     * @param createVoteRequest Information of the vote to be created.
+     * @param voteRequest Information of the vote to be created.
      * @return The created vote for the Voting service.
      */
     @PutMapping("/vote")
