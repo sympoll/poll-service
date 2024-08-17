@@ -112,7 +112,7 @@ public class Validator {
     }
 
     private void validateGroupIdExist(String groupId) {
-        ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(new GroupIdExistsRequest(groupId));
+        ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(groupId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
