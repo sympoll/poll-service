@@ -8,8 +8,7 @@ public class GroupClientStub {
     }
 
     private static void stubGroupIdExists(){
-        stubFor(get(urlEqualTo("/api/group"))
-                .withRequestBody(matchingJsonPath("$.groupId"))
+        stubFor(get(urlEqualTo("/api/group/id?groupId=123"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
