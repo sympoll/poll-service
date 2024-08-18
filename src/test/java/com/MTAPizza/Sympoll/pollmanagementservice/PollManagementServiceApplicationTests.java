@@ -60,7 +60,7 @@ class PollManagementServiceApplicationTests {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
         WireMock.reset();
-        UserClientStub.initStubs();
+        UserClientStub.initStubs(rndCreatorUUID);
         GroupClientStub.initStubs();
     }
 
