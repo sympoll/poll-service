@@ -1,4 +1,4 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.dto.error;
 
-public record JsonParserError(String message) {
+public record ResourceNotFoundResponse(String message) {
 }

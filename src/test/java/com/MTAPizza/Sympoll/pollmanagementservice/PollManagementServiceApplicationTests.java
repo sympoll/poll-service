@@ -1,6 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentError;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
@@ -8,7 +8,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.stub.GroupClientStub;
 import com.MTAPizza.Sympoll.pollmanagementservice.stub.UserClientStub;
-import com.MTAPizza.Sympoll.pollmanagementservice.validator.exception.PollExceptionHandler;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.PollExceptionHandler;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
@@ -254,7 +254,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
+        IllegalArgumentResponse errorResponse = response.as(IllegalArgumentResponse.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("A deadline cannot be earlier than the time a poll was created", errorResponse.message());
     }
@@ -278,7 +278,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(gson.toJson(request), HttpStatus.BAD_REQUEST);
 
         // Verify the response body
-        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
+        IllegalArgumentResponse errorResponse = response.as(IllegalArgumentResponse.class);
         assertNotNull(errorResponse, "Error response should not be null");
         assertEquals("Number of allowed answers is greater than number of available answers", errorResponse.message());
     }
@@ -311,7 +311,7 @@ class PollManagementServiceApplicationTests {
         Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
 
         // Verify the response code
-        IllegalArgumentError errorResponse = response.as(IllegalArgumentError.class);
+        IllegalArgumentResponse errorResponse = response.as(IllegalArgumentResponse.class);
         assertNotNull(errorResponse, "Error response should not be null");
     }
 
