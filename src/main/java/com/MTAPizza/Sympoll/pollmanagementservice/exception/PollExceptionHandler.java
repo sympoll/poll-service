@@ -4,6 +4,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollErrorResp
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.JsonParserErrorResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.ResourceNotFoundResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

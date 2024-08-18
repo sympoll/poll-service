@@ -1,4 +1,4 @@
-package com.MTAPizza.Sympoll.pollmanagementservice.exception;
+package com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found;
 
 public class ResourceNotFoundException extends RuntimeException{
     public ResourceNotFoundException(String message) {
