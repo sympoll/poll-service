@@ -36,7 +36,7 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<JsonParserErrorResponse> handleInvalidJsonException(HttpMessageNotReadableException ex, WebRequest request) {
-        log.info("Encountered a request body without valid JSON format: {}", ex.getMessage());
+        log.info("Encountered a request without valid JSON format: {}", ex.getMessage());
         return new ResponseEntity<>(new JsonParserErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -45,7 +45,7 @@ public class PollExceptionHandler {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResourceNotFoundResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        log.info("Encountered a request body without valid resource ID: {}", ex.getMessage());
+        log.info("Encountered a request without valid resource ID: {}", ex.getMessage());
         return new ResponseEntity<>(new ResourceNotFoundResponse(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
