@@ -59,7 +59,7 @@ public class Validator {
     }
 
     public void validateDeletePollRequest(PollDeleteRequest pollDeleteRequest) {
-        //validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId());
+        validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId(), pollDeleteRequest.pollId());
         validatePollIdExist(pollDeleteRequest.pollId());
     }
 
@@ -117,8 +117,11 @@ public class Validator {
         }
     }
 
-    private void validateUserHasPermissions(UUID userId, String groupId) {
-        // TODO: change this validation to send request to group service
+    private void validateUserHasPermissions(UUID userId, String groupId, UUID pollId) {
+        if(!isUserCreatedThePoll(userId,pollId) && !isUserGroupModeratorOrAdmin(userId, groupId)) {
+            log.warn("User {} has no permissions to delete the poll", userId);
+            throw new IllegalArgumentException("User " + userId + " has no permissions to delete the poll");
+        }
     }
 
     public void validateVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
@@ -155,4 +158,22 @@ public class Validator {
             }
         }
     }
+
+    private boolean isUserCreatedThePoll(UUID userId, UUID pollId) {
+        return pollRepository.getReferenceById(pollId).getCreatorId().equals(userId);
+    }
+
+    private boolean isUserGroupModeratorOrAdmin(UUID userId, String groupId) {
+        ResponseEntity<String> response = groupClient.getUserRollName(userId, groupId);
+        boolean result = false;
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            if (response.getBody().equals("Group Moderator") || response.getBody().equals("Group Admin")) {
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
 }
