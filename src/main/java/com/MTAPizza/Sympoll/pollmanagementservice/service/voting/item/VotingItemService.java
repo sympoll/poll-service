@@ -25,7 +25,7 @@ public class VotingItemService {
      * @return The voting item count and description.
      */
     public VoteResponse updateVotingItem(VoteRequest voteRequest) {
-        validator.validatVoteRequest(voteRequest);
+        validator.validateVoteRequest(voteRequest);
         int action;
 
         if(VoteAction.ADD.name().equalsIgnoreCase(voteRequest.action())){

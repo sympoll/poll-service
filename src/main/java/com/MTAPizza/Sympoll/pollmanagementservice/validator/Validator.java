@@ -9,6 +9,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExist
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +87,7 @@ public class Validator {
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
                 log.warn("User {} does not exists.", userId);
-                throw new IllegalArgumentException("User " + userId + " does not exist");
+                throw new ResourceNotFoundException("User " + userId + " does not exist");
             }
         }
     }
@@ -101,7 +102,7 @@ public class Validator {
     private void validatePollIdExist(UUID pollId) {
         if(!pollRepository.existsById(pollId)) {
             log.warn("User tried to interact with a poll that does not exist.");
-            throw new IllegalArgumentException("Poll with id " + pollId + " does not exist");
+            throw new ResourceNotFoundException("Poll with id " + pollId + " does not exist");
         }
     }
 
@@ -111,7 +112,7 @@ public class Validator {
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
                 log.warn("Group {} does not exists.", groupId);
-                throw new IllegalArgumentException("Group " + groupId + " does not exist");
+                throw new ResourceNotFoundException("Group " + groupId + " does not exist");
             }
         }
     }
@@ -120,7 +121,7 @@ public class Validator {
         // TODO: change this validation to send request to group service
     }
 
-    public void validatVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
+    public void validateVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
         validateVotingItemIdExists(voteRequest.votingItemId());
         validateVoteAction(voteRequest.action());
         validateDeleteVote(voteRequest);
@@ -134,14 +135,14 @@ public class Validator {
     private void validateVotingItemIdExists(int votingItemId) {
         if(!votingItemRepository.existsById(votingItemId)) {
             log.warn("Client tried to vote for an answer that does not exist.");
-            throw new IllegalArgumentException("Vote with id " + votingItemId + " does not exist");
+            throw new ResourceNotFoundException("Vote with id " + votingItemId + " does not exist");
         }
     }
 
     private void validateVoteAction(String action) {
         if(!action.equals("add") && !action.equals("remove")) {
             log.warn("Client tried to request an action that does not exist.");
-            throw new IllegalArgumentException("Action " + action + " does not exist");
+            throw new ResourceNotFoundException("Action " + action + " does not exist");
         }
     }
 
