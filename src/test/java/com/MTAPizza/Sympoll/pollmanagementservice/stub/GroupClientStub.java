@@ -1,10 +1,13 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.stub;
 
+import java.util.UUID;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class GroupClientStub {
-    public static void initStubs(){
+    public static void initStubs(UUID userId){
         stubGroupIdExists();
+        stubUserHasPermission(userId);
     }
 
     private static void stubGroupIdExists(){
@@ -17,5 +20,13 @@ public class GroupClientStub {
                   "isExists": true
                 }
                 """)));
+    }
+
+    private static void stubUserHasPermission(UUID userId){
+        stubFor(get(urlEqualTo("/api/group/user-role?userId=" + userId.toString() + "&groupId=123"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("Group Admin")));
     }
 }
