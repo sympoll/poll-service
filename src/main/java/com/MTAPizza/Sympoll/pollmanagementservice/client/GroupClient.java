@@ -5,7 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 
+import java.util.UUID;
+
 public interface GroupClient {
     @GetExchange("/api/group/id")
     ResponseEntity<GroupIdExistsResponse> checkGroupIdExists(@RequestParam String groupId);
+
+    @GetExchange("/api/group/user-role/permission/delete")
+    ResponseEntity<Boolean> checkUserPermissionToDeletePoll(@RequestParam UUID userId, @RequestParam String groupId);
 }

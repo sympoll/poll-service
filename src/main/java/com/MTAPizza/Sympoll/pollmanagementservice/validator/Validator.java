@@ -9,6 +9,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExist
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.access.denied.AccessDeniedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
@@ -36,7 +37,7 @@ public class Validator {
     private final UserClient userClient;
     private final GroupClient groupClient;
 
-    public void validateNewPoll(PollCreateRequest poll) throws IllegalArgumentException{
+    public void validateNewPoll(PollCreateRequest poll){
         validateAllowedVotingItems(poll.votingItems().size(), poll);
         validateDeadline(LocalDateTime.now(), poll);
         validateGroupIdExist(poll.groupId());
@@ -59,7 +60,7 @@ public class Validator {
     }
 
     public void validateDeletePollRequest(PollDeleteRequest pollDeleteRequest) {
-        //validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId());
+        validateUserHasPermissions(pollDeleteRequest.userId(), pollDeleteRequest.groupId(), pollDeleteRequest.pollId());
         validatePollIdExist(pollDeleteRequest.pollId());
     }
 
@@ -117,8 +118,11 @@ public class Validator {
         }
     }
 
-    private void validateUserHasPermissions(UUID userId, String groupId) {
-        // TODO: change this validation to send request to group service
+    private void validateUserHasPermissions(UUID userId, String groupId, UUID pollId) {
+        if(!isUserCreatedThePoll(userId,pollId) && !isUserHasPermission(userId, groupId)) {
+            log.warn("User {} has no permissions to delete the poll", userId);
+            throw new AccessDeniedException("User " + userId + " has no permissions to delete the poll");
+        }
     }
 
     public void validateVoteRequest(VoteRequest voteRequest) throws IllegalArgumentException{
@@ -154,5 +158,20 @@ public class Validator {
                 throw new IllegalArgumentException("Can not remove vote from voting item with 0 vote count");
             }
         }
+    }
+
+    private boolean isUserCreatedThePoll(UUID userId, UUID pollId) {
+        return pollRepository.getReferenceById(pollId).getCreatorId().equals(userId);
+    }
+
+    private boolean isUserHasPermission(UUID userId, String groupId) {
+        ResponseEntity<Boolean> response = groupClient.checkUserPermissionToDeletePoll(userId, groupId);
+        boolean result = false;
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            result = response.getBody();
+        }
+
+        return result;
     }
 }

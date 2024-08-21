@@ -61,7 +61,7 @@ class PollManagementServiceApplicationTests {
         RestAssured.port = port;
         WireMock.reset();
         UserClientStub.initStubs(rndCreatorUUID);
-        GroupClientStub.initStubs();
+        GroupClientStub.initStubs(rndCreatorUUID);
     }
 
     static {
