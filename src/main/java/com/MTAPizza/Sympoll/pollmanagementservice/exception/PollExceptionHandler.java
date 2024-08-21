@@ -50,7 +50,7 @@ public class PollExceptionHandler {
     /**
      * Handles access denied exceptions.
      */
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<AccessDeniedErrorResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
         log.info("Encountered a request from a user without access to the requested action: {}", ex.getMessage());
         return new ResponseEntity<>(new AccessDeniedErrorResponse(ex.getMessage()), HttpStatus.NOT_FOUND);
