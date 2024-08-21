@@ -1,9 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.exception;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.GeneralPollErrorResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.JsonParserErrorResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.ResourceNotFoundResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.*;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.access.denied.AccessDeniedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +45,15 @@ public class PollExceptionHandler {
     public ResponseEntity<ResourceNotFoundResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         log.info("Encountered a request without valid resource ID: {}", ex.getMessage());
         return new ResponseEntity<>(new ResourceNotFoundResponse(ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles access denied exceptions.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<AccessDeniedErrorResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        log.info("Encountered a request from a user without access to the requested action: {}", ex.getMessage());
+        return new ResponseEntity<>(new AccessDeniedErrorResponse(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     /**

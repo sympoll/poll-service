@@ -11,6 +11,6 @@ public interface GroupClient {
     @GetExchange("/api/group/id")
     ResponseEntity<GroupIdExistsResponse> checkGroupIdExists(@RequestParam String groupId);
 
-    @GetExchange("/api/group/user-role/name")
-    ResponseEntity<String> getUserRollName(@RequestParam UUID userId, @RequestParam String groupId);
+    @GetExchange("/api/group/user-role/permission/delete")
+    ResponseEntity<Boolean> checkUserPermissionToDeletePoll(@RequestParam UUID userId, @RequestParam String groupId);
 }

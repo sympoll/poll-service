@@ -9,6 +9,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExist
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.access.denied.AccessDeniedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
@@ -36,7 +37,7 @@ public class Validator {
     private final UserClient userClient;
     private final GroupClient groupClient;
 
-    public void validateNewPoll(PollCreateRequest poll) throws IllegalArgumentException{
+    public void validateNewPoll(PollCreateRequest poll){
         validateAllowedVotingItems(poll.votingItems().size(), poll);
         validateDeadline(LocalDateTime.now(), poll);
         validateGroupIdExist(poll.groupId());
@@ -118,9 +119,9 @@ public class Validator {
     }
 
     private void validateUserHasPermissions(UUID userId, String groupId, UUID pollId) {
-        if(!isUserCreatedThePoll(userId,pollId) && !isUserGroupModeratorOrAdmin(userId, groupId)) {
+        if(!isUserCreatedThePoll(userId,pollId) && !isUserHasPermission(userId, groupId)) {
             log.warn("User {} has no permissions to delete the poll", userId);
-            throw new IllegalArgumentException("User " + userId + " has no permissions to delete the poll");
+            throw new AccessDeniedException("User " + userId + " has no permissions to delete the poll");
         }
     }
 
@@ -163,17 +164,14 @@ public class Validator {
         return pollRepository.getReferenceById(pollId).getCreatorId().equals(userId);
     }
 
-    private boolean isUserGroupModeratorOrAdmin(UUID userId, String groupId) {
-        ResponseEntity<String> response = groupClient.getUserRollName(userId, groupId);
+    private boolean isUserHasPermission(UUID userId, String groupId) {
+        ResponseEntity<Boolean> response = groupClient.checkUserPermissionToDeletePoll(userId, groupId);
         boolean result = false;
 
         if (response.getStatusCode().is2xxSuccessful()) {
-            if (response.getBody().equals("Group Moderator") || response.getBody().equals("Group Admin")) {
-                result = true;
-            }
+            result = response.getBody();
         }
 
         return result;
     }
-
 }

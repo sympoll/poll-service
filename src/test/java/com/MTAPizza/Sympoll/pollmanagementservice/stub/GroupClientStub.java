@@ -23,7 +23,7 @@ public class GroupClientStub {
     }
 
     private static void stubUserHasPermission(UUID userId){
-        stubFor(get(urlEqualTo("/api/group/user-role?userId=" + userId.toString() + "&groupId=123"))
+        stubFor(get(urlEqualTo("/api/group/user-role/permission/delete?userId=" + userId.toString() + "&groupId=123"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
