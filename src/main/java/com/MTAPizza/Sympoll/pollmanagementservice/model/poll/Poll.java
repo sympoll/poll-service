@@ -68,7 +68,11 @@ public class Poll implements Comparable<Poll>{
                 timeCreated,
                 timeUpdated,
                 deadline,
-                votingItems.stream().map(VotingItem::toVotingItemResponse).toList() // Convert votingItems to VotingItemResponse objects
+                votingItems
+                        .stream()
+                        .sorted(Comparator.comparing(VotingItem::getVotingItemId))
+                        .map(VotingItem::toVotingItemResponse)
+                        .toList() // Convert votingItems to VotingItemResponse objects
         );
     }
 
