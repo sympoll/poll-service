@@ -30,6 +30,19 @@ public class PollService {
     private final UserClient userClient;
 
     /**
+     * Get poll response DTO of the poll, including the creator name.
+     * @param poll Poll to convert.
+     * @return DTO of PollResponse with a creator name.
+     */
+    private PollResponse getPollResponseWithCreatorName(Poll poll) {
+        poll.setCreatorName(
+                Objects.requireNonNull(
+                        userClient.getUserById(poll.getCreatorId())
+                                .getBody()).username());
+        return poll.toPollResponse();
+    }
+
+    /**
      * Create and add a poll to the database.
      * @param pollCreateRequest Details of the poll to add.
      * @return The poll that was added to the database.
@@ -46,14 +59,10 @@ public class PollService {
                 .deadline(convertToDate(pollCreateRequest.deadline()))
                 .build();
         poll.setVotingItems(convertVotingItemsToModel(pollCreateRequest.votingItems(), poll.getPollId()));
-        poll.setCreatorName(
-                Objects.requireNonNull(
-                        userClient.getUserById(pollCreateRequest.creatorId())
-                                .getBody()).username());
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
-        return poll.toPollResponse();
+        return getPollResponseWithCreatorName(poll);
     }
 
     /**
@@ -94,7 +103,7 @@ public class PollService {
         return pollRepository
                 .findAll()
                 .stream()
-                .map(Poll::toPollResponse)
+                .map(this::getPollResponseWithCreatorName)
                 .toList();
     }
 
@@ -121,7 +130,7 @@ public class PollService {
         validator.validateGetPollByIdRequest(pollId);
 
         log.info("Retrieving poll with ID: {}", pollId);
-        return pollRepository.getReferenceById(pollId).toPollResponse();
+        return getPollResponseWithCreatorName(pollRepository.getReferenceById(pollId));
     }
 
     /**
@@ -137,7 +146,7 @@ public class PollService {
                 .stream()
                 .filter(poll -> poll.getGroupId().equals(groupId))
                 .sorted() // Sort by date, most recent poll first.
-                .map(Poll::toPollResponse)
+                .map(this::getPollResponseWithCreatorName)
                 .toList();
     }
 
@@ -161,6 +170,6 @@ public class PollService {
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
-        return resPolls.stream().sorted().map(Poll::toPollResponse).toList();
+        return resPolls.stream().sorted().map(this::getPollResponseWithCreatorName).toList();
     }
 }
