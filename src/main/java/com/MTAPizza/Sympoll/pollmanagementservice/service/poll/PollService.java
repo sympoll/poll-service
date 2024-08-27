@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,6 +27,20 @@ import java.util.UUID;
 public class PollService {
     private final PollRepository pollRepository;
     private final Validator validator;
+    private final UserClient userClient;
+
+    /**
+     * Get poll response DTO of the poll, including the creator name.
+     * @param poll Poll to convert.
+     * @return DTO of PollResponse with a creator name.
+     */
+    private PollResponse getPollResponseWithCreatorName(Poll poll) {
+        poll.setCreatorName(
+                Objects.requireNonNull(
+                        userClient.getUserById(poll.getCreatorId())
+                                .getBody()).username());
+        return poll.toPollResponse();
+    }
 
     /**
      * Create and add a poll to the database.
@@ -46,7 +62,7 @@ public class PollService {
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
-        return poll.toPollResponse();
+        return getPollResponseWithCreatorName(poll);
     }
 
     /**
@@ -56,7 +72,7 @@ public class PollService {
      */
     private List<VotingItem> convertVotingItemsToModel(List<String> votingItems, UUID pollId) {
         List<VotingItem> resVotingItems = new ArrayList<>();
-        int ord = 0;
+
         for (String votingItem : votingItems) {
             VotingItem newVotingItem = new VotingItem();
             newVotingItem.setPollId(pollId);
@@ -87,7 +103,7 @@ public class PollService {
         return pollRepository
                 .findAll()
                 .stream()
-                .map(Poll::toPollResponse)
+                .map(this::getPollResponseWithCreatorName)
                 .toList();
     }
 
@@ -114,7 +130,7 @@ public class PollService {
         validator.validateGetPollByIdRequest(pollId);
 
         log.info("Retrieving poll with ID: {}", pollId);
-        return pollRepository.getReferenceById(pollId).toPollResponse();
+        return getPollResponseWithCreatorName(pollRepository.getReferenceById(pollId));
     }
 
     /**
@@ -130,7 +146,7 @@ public class PollService {
                 .stream()
                 .filter(poll -> poll.getGroupId().equals(groupId))
                 .sorted() // Sort by date, most recent poll first.
-                .map(Poll::toPollResponse)
+                .map(this::getPollResponseWithCreatorName)
                 .toList();
     }
 
@@ -154,6 +170,6 @@ public class PollService {
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
-        return resPolls.stream().sorted().map(Poll::toPollResponse).toList();
+        return resPolls.stream().sorted().map(this::getPollResponseWithCreatorName).toList();
     }
 }

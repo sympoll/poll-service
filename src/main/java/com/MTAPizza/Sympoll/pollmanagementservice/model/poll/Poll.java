@@ -3,6 +3,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.voting.item.VotingItemResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
+import com.MTAPizza.Sympoll.pollmanagementservice.service.poll.PollService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,9 @@ public class Poll implements Comparable<Poll>{
     @Column(name = "creator_id")
     private UUID creatorId;
 
+    @Transient
+    private String creatorName;
+
     @Column(name = "group_id")
     private String groupId;
 
@@ -55,7 +59,7 @@ public class Poll implements Comparable<Poll>{
     private List<VotingItem> votingItems;
 
     /**
-     * @return A PollResponse representation if this poll
+     * @return A PollResponse representation of the poll
      */
     public PollResponse toPollResponse(){
         return new PollResponse(
@@ -64,6 +68,7 @@ public class Poll implements Comparable<Poll>{
                 description,
                 nofAnswersAllowed,
                 creatorId,
+                creatorName,
                 groupId,
                 timeCreated,
                 timeUpdated,
