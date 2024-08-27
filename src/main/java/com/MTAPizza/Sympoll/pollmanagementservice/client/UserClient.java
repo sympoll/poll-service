@@ -12,6 +12,6 @@ public interface UserClient {
     @GetExchange("/api/user/id")
     ResponseEntity<UserIdExistsResponse> checkUserIdExists(@RequestParam UUID userId);
 
-    @GetExchange("/api/by-user-id")
+    @GetExchange("/api/user/by-user-id")
     ResponseEntity<UserResponse> getUserById(@RequestParam UUID userId);
 }

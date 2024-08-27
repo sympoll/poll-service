@@ -46,7 +46,10 @@ public class PollService {
                 .deadline(convertToDate(pollCreateRequest.deadline()))
                 .build();
         poll.setVotingItems(convertVotingItemsToModel(pollCreateRequest.votingItems(), poll.getPollId()));
-        poll.setCreatorName(Objects.requireNonNull(userClient.getUserById(pollCreateRequest.creatorId()).getBody()).username());
+        poll.setCreatorName(
+                Objects.requireNonNull(
+                        userClient.getUserById(pollCreateRequest.creatorId())
+                                .getBody()).username());
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
@@ -60,7 +63,7 @@ public class PollService {
      */
     private List<VotingItem> convertVotingItemsToModel(List<String> votingItems, UUID pollId) {
         List<VotingItem> resVotingItems = new ArrayList<>();
-        int ord = 0;
+
         for (String votingItem : votingItems) {
             VotingItem newVotingItem = new VotingItem();
             newVotingItem.setPollId(pollId);
