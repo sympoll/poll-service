@@ -23,7 +23,6 @@ import java.util.UUID;
 @RequestMapping("/api/poll")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class ServiceController {
     private final PollService pollService;
     private final VotingItemService votingItemService;
