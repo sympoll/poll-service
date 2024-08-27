@@ -31,7 +31,6 @@ public class UserClientStub {
                 {
                   "userId": "%s",
                   "username": "Roy",
-                  "passwordHash": "324324",
                   "email": "Roy@gmail.com",
                   "timeCreated": "2024-08-14T10:00:00"
                 }
