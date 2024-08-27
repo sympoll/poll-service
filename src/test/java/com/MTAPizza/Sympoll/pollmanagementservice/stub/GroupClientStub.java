@@ -8,6 +8,7 @@ public class GroupClientStub {
     public static void initStubs(UUID userId){
         stubGroupIdExists();
         stubUserHasPermission(userId);
+        stubGetGroupName();
     }
 
     private static void stubGroupIdExists(){
@@ -28,5 +29,18 @@ public class GroupClientStub {
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withBody("Group Admin")));
+    }
+
+    private static void stubGetGroupName(){
+        stubFor(get(urlEqualTo("/api/group/by-group-id?groupId=123"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("""
+                {
+                  "groupId": "123",
+                  "groupName": "Group"
+                }
+                """)));
     }
 }
