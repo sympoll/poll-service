@@ -45,6 +45,9 @@ public class Poll implements Comparable<Poll>{
     @Column(name = "group_id")
     private String groupId;
 
+    @Transient
+    private String groupName;
+
     @Column(name = "time_created")
     private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.
 
@@ -70,6 +73,7 @@ public class Poll implements Comparable<Poll>{
                 creatorId,
                 creatorName,
                 groupId,
+                groupName,
                 timeCreated,
                 timeUpdated,
                 deadline,

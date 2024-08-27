@@ -8,7 +8,6 @@ import java.util.UUID;
 public record UserResponse(
         UUID userId,
         String username,
-        String passwordHash,
         String email,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime timeCreated

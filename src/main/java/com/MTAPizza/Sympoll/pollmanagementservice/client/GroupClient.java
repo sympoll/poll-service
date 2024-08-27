@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.client;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,4 +14,7 @@ public interface GroupClient {
 
     @GetExchange("/api/group/user-role/permission/delete")
     ResponseEntity<Boolean> checkUserPermissionToDeletePoll(@RequestParam UUID userId, @RequestParam String groupId);
+
+    @GetExchange("/api/group/by-group-id")
+    ResponseEntity<GroupNameResponse> getGroupNameById(@RequestParam String groupId);
 }

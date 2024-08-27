@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
@@ -28,6 +29,7 @@ public class PollService {
     private final PollRepository pollRepository;
     private final Validator validator;
     private final UserClient userClient;
+    private final GroupClient groupClient;
 
     /**
      * Get poll response DTO of the poll, including the creator name.
@@ -39,6 +41,12 @@ public class PollService {
                 Objects.requireNonNull(
                         userClient.getUserById(poll.getCreatorId())
                                 .getBody()).username());
+
+        poll.setGroupName(
+                Objects.requireNonNull(
+                        groupClient.getGroupNameById(poll.getGroupId())
+                                .getBody()).groupName());
+
         return poll.toPollResponse();
     }
 
