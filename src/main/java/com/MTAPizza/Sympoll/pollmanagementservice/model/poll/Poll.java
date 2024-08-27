@@ -38,6 +38,8 @@ public class Poll implements Comparable<Poll>{
     @Column(name = "creator_id")
     private UUID creatorId;
 
+    private String creatorName;
+
     @Column(name = "group_id")
     private String groupId;
 
@@ -64,6 +66,7 @@ public class Poll implements Comparable<Poll>{
                 description,
                 nofAnswersAllowed,
                 creatorId,
+                creatorName,
                 groupId,
                 timeCreated,
                 timeUpdated,

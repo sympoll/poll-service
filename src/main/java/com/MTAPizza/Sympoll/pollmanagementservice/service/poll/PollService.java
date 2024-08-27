@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class PollService {
     private final PollRepository pollRepository;
     private final Validator validator;
+    private final UserClient userClient;
 
     /**
      * Create and add a poll to the database.
@@ -43,6 +46,7 @@ public class PollService {
                 .deadline(convertToDate(pollCreateRequest.deadline()))
                 .build();
         poll.setVotingItems(convertVotingItemsToModel(pollCreateRequest.votingItems(), poll.getPollId()));
+        poll.setCreatorName(Objects.requireNonNull(userClient.getUserById(pollCreateRequest.creatorId()).getBody()).username());
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
