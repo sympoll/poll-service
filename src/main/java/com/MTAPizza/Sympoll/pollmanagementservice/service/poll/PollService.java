@@ -13,6 +13,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -55,6 +56,7 @@ public class PollService {
      * @param pollCreateRequest Details of the poll to add.
      * @return The poll that was added to the database.
      */
+    @Transactional
     public PollResponse createPoll(PollCreateRequest pollCreateRequest) {
         validator.validateNewPoll(pollCreateRequest);
 
@@ -120,6 +122,7 @@ public class PollService {
      * @param pollDeleteRequest ID of the poll to delete and the ID of the user.
      * @return the ID of the poll deleted.
      */
+    @Transactional
     public PollDeleteResponse deletePoll(PollDeleteRequest pollDeleteRequest) {
         validator.validateDeletePollRequest(pollDeleteRequest);
 

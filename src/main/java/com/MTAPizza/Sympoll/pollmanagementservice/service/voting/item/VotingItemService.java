@@ -11,6 +11,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class VotingItemService {
      * @param voteRequest Information of the vote to be updated and the requested action.
      * @return The voting item count and description.
      */
+    @Transactional
     public VoteResponse updateVotingItem(VoteRequest voteRequest) {
         validator.validateVoteRequest(voteRequest);
         int action;
