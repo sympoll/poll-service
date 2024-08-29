@@ -11,6 +11,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.action.VoteAction;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.access.denied.AccessDeniedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.request.RequestFailedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.voting.item.VotingItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class Validator {
 
     private void validateAllowedVotingItems(int nofVotingItems, PollCreateRequest poll) {
         if (poll.nofAnswersAllowed() > nofVotingItems) {
-            log.warn("User {} tried to create a poll but an number of answers allowed was given.", poll.creatorId());
+            log.error("User {} tried to create a poll but an number of answers allowed was given.", poll.creatorId());
             throw new IllegalArgumentException("Number of allowed answers is greater than number of available answers");
         }
     }
@@ -77,50 +78,58 @@ public class Validator {
         LocalDateTime deadline = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         if (deadline.isBefore(timeCreated)) {
-            log.warn("User {} tried to create a poll but an invalid deadline was given.", poll.creatorId());
+            log.error("User {} tried to create a poll but an invalid deadline was given.", poll.creatorId());
             throw new IllegalArgumentException("A deadline cannot be earlier than the time a poll was created");
         }
     }
 
     private void validateUserIdExist(UUID userId) {
+        log.info("Sending validating user id request to user service");
         ResponseEntity<UserIdExistsResponse> response = userClient.checkUserIdExists(userId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
-                log.warn("User {} does not exists.", userId);
+                log.error("User {} does not exists.", userId);
                 throw new ResourceNotFoundException("User " + userId + " does not exist");
             }
+        } else {
+            log.error("Request to user service with user id '{}' failed. Status code {}", userId, response.getStatusCode());
+            throw new RequestFailedException("Request to user service failed. Status code " + response.getStatusCode());
         }
     }
 
     private void validateVotingItemsStringList(PollCreateRequest poll) {
         if(poll.votingItems() == null || poll.votingItems().isEmpty()){
-            log.warn("User {} tried to create a poll without voting item list", poll.creatorId());
+            log.error("User {} tried to create a poll without voting item list", poll.creatorId());
             throw new  IllegalArgumentException("A list of voting items cannot be empty");
         }
     }
 
     private void validatePollIdExist(UUID pollId) {
         if(!pollRepository.existsById(pollId)) {
-            log.warn("User tried to interact with a poll that does not exist.");
+            log.error("User tried to interact with a poll that does not exist.");
             throw new ResourceNotFoundException("Poll with id " + pollId + " does not exist");
         }
     }
 
     private void validateGroupIdExist(String groupId) {
+        log.info("Sending validating group id request to group service");
         ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(groupId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             if(!response.getBody().isExists()){
-                log.warn("Group {} does not exists.", groupId);
+                log.error("Group {} does not exists.", groupId);
                 throw new ResourceNotFoundException("Group " + groupId + " does not exist");
             }
+        } else {
+            log.error("Request to group service with group id '{}' failed. Status code {}", groupId, response.getStatusCode());
+            throw new RequestFailedException("Request to group service failed. Status code " + response.getStatusCode());
         }
     }
 
     private void validateUserHasPermissions(UUID userId, String groupId, UUID pollId) {
         if(!isUserCreatedThePoll(userId,pollId) && !isUserHasPermission(userId, groupId)) {
-            log.warn("User {} has no permissions to delete the poll", userId);
+            log.error("User {} has no permissions to delete the poll", userId);
             throw new AccessDeniedException("User " + userId + " has no permissions to delete the poll");
         }
     }
@@ -138,14 +147,14 @@ public class Validator {
 
     private void validateVotingItemIdExists(int votingItemId) {
         if(!votingItemRepository.existsById(votingItemId)) {
-            log.warn("Client tried to vote for an answer that does not exist.");
+            log.error("Client tried to vote for an answer that does not exist.");
             throw new ResourceNotFoundException("Vote with id " + votingItemId + " does not exist");
         }
     }
 
     private void validateVoteAction(String action) {
         if(!action.equals("add") && !action.equals("remove")) {
-            log.warn("Client tried to request an action that does not exist.");
+            log.error("Client tried to request an action that does not exist.");
             throw new ResourceNotFoundException("Action " + action + " does not exist");
         }
     }
@@ -154,7 +163,7 @@ public class Validator {
         if(VoteAction.REMOVE.name().equalsIgnoreCase(voteRequest.action())) {
             int voteCount = votingItemRepository.getReferenceById(voteRequest.votingItemId()).getVoteCount();
             if(voteCount <= 0) {
-                log.warn("Client tried to remove vote from a vote with 0 vote count.");
+                log.error("Client tried to remove vote from a vote with 0 vote count.");
                 throw new IllegalArgumentException("Can not remove vote from voting item with 0 vote count");
             }
         }
@@ -165,11 +174,15 @@ public class Validator {
     }
 
     private boolean isUserHasPermission(UUID userId, String groupId) {
+        log.info("Sending validating permissions request to group service");
         ResponseEntity<Boolean> response = groupClient.checkUserPermissionToDeletePoll(userId, groupId);
         boolean result = false;
 
         if (response.getStatusCode().is2xxSuccessful()) {
             result = response.getBody();
+        } else {
+            log.error("Request to group service with group id '{}' and user id '{}' failed. Status code {}", groupId, userId, response.getStatusCode());
+            throw new RequestFailedException("Request to group service failed. Status code " + response.getStatusCode());
         }
 
         return result;

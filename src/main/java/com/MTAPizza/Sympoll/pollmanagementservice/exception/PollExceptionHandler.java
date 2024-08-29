@@ -3,6 +3,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.exception;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.*;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.access.denied.AccessDeniedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.request.RequestFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,16 @@ public class PollExceptionHandler {
         log.info("Encountered a request from a user without access to the requested action: {}", ex.getMessage());
         return new ResponseEntity<>(new AccessDeniedErrorResponse(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+    /**
+     * Handles request failed exceptions.
+     */
+    @ExceptionHandler(RequestFailedException.class)
+    public ResponseEntity<RequestFailedErrorResponse> handleAccessDeniedException(RequestFailedException ex, WebRequest request) {
+        log.info("Encountered an unsuccessful request to other microservice: {}", ex.getMessage());
+        return new ResponseEntity<>(new RequestFailedErrorResponse(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     /**
      * Handles unhandled exceptions.
