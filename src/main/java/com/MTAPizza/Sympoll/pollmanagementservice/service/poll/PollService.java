@@ -38,11 +38,13 @@ public class PollService {
      * @return DTO of PollResponse with a creator name.
      */
     private PollResponse getPollResponseWithCreatorName(Poll poll) {
+        log.info("Sending request to get username from user service");
         poll.setCreatorName(
                 Objects.requireNonNull(
                         userClient.getUserById(poll.getCreatorId())
                                 .getBody()).username());
 
+        log.info("Sending request to get group name from group service");
         poll.setGroupName(
                 Objects.requireNonNull(
                         groupClient.getGroupNameById(poll.getGroupId())

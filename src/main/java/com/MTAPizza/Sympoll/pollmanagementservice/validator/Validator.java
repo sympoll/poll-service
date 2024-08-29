@@ -83,6 +83,7 @@ public class Validator {
     }
 
     private void validateUserIdExist(UUID userId) {
+        log.info("Sending validating user id request to user service");
         ResponseEntity<UserIdExistsResponse> response = userClient.checkUserIdExists(userId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -108,6 +109,7 @@ public class Validator {
     }
 
     private void validateGroupIdExist(String groupId) {
+        log.info("Sending validating group id request to group service");
         ResponseEntity<GroupIdExistsResponse> response = groupClient.checkGroupIdExists(groupId);
 
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -165,6 +167,7 @@ public class Validator {
     }
 
     private boolean isUserHasPermission(UUID userId, String groupId) {
+        log.info("Sending validating permissions request to group service");
         ResponseEntity<Boolean> response = groupClient.checkUserPermissionToDeletePoll(userId, groupId);
         boolean result = false;
 
