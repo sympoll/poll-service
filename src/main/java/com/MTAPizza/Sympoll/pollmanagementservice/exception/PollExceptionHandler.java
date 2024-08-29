@@ -58,7 +58,7 @@ public class PollExceptionHandler {
     }
 
     /**
-     * Handles access denied exceptions.
+     * Handles request failed exceptions.
      */
     @ExceptionHandler(RequestFailedException.class)
     public ResponseEntity<RequestFailedErrorResponse> handleAccessDeniedException(RequestFailedException ex, WebRequest request) {
