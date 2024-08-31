@@ -32,7 +32,7 @@ public class GroupClientStub {
     }
 
     private static void stubGetGroupName(){
-        stubFor(get(urlEqualTo("/api/group/by-group-id?groupId=123"))
+        stubFor(get(urlEqualTo("/api/group/name/by-group-id?groupId=123"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
