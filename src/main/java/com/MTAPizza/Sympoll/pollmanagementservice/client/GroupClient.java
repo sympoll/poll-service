@@ -1,6 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.client;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.UserGroupsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,4 +18,7 @@ public interface GroupClient {
 
     @GetExchange("/api/group/name/by-group-id")
     ResponseEntity<GroupNameResponse> getGroupNameById(@RequestParam String groupId);
+
+    @GetExchange("/api/group/all-user-groups")
+    ResponseEntity<UserGroupsResponse> getAllUserGroups(@RequestParam UUID userId);
 }

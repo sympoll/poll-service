@@ -34,6 +34,7 @@ public class PollService {
 
     /**
      * Get poll response DTO of the poll, including the creator name.
+     *
      * @param poll Poll to convert.
      * @return DTO of PollResponse with a creator name.
      */
@@ -55,6 +56,7 @@ public class PollService {
 
     /**
      * Create and add a poll to the database.
+     *
      * @param pollCreateRequest Details of the poll to add.
      * @return The poll that was added to the database.
      */
@@ -79,6 +81,7 @@ public class PollService {
 
     /**
      * Converts a list of voting items strings into a list of Answer entities.
+     *
      * @param votingItems List of voting items strings to be converted.
      * @return List of voting items entities.
      */
@@ -98,6 +101,7 @@ public class PollService {
 
     /**
      * Converts a timestamp string to LocalDateTime.
+     *
      * @param timeStamp The timestamp string in ISO-8601 format.
      * @return LocalDateTime representation of the timestamp.
      */
@@ -108,6 +112,7 @@ public class PollService {
 
     /**
      * Retrieves all polls from the repository and maps them to PollResponse DTOs.
+     *
      * @return List of PollResponse DTOs containing details of all polls.
      */
     public List<PollResponse> getAllPolls() {
@@ -121,6 +126,7 @@ public class PollService {
 
     /**
      * Delete a poll from the database.
+     *
      * @param pollDeleteRequest ID of the poll to delete and the ID of the user.
      * @return the ID of the poll deleted.
      */
@@ -136,6 +142,7 @@ public class PollService {
 
     /**
      * Retrieve a poll from the database.
+     *
      * @param pollId ID of the poll to retrieve.
      * @return The retrieved poll's details.
      */
@@ -172,17 +179,34 @@ public class PollService {
 
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
         List<Poll> resPolls = new ArrayList<>();
-        for(String groupId : groupIds) {
+        for (String groupId : groupIds) {
             resPolls.addAll(
                     pollRepository
-                        .findAll()
-                        .stream()
-                        .filter(poll -> poll.getGroupId().equals(groupId))
-                        .toList());
+                            .findAll()
+                            .stream()
+                            .filter(poll -> poll.getGroupId().equals(groupId))
+                            .toList());
         }
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
         return resPolls.stream().sorted().map(this::getPollResponseWithCreatorName).toList();
+    }
+
+    /**
+     * Get a list of all polls from all groups the given user is a member of.
+     * Polls are returned sorted in descending order by creation date.
+     */
+    public List<PollResponse> getAllUserPolls(UUID userId) {
+        List<String> userGroups = Objects.requireNonNull(
+                groupClient.getAllUserGroups(userId)
+                        .getBody().userGroups());
+
+        List<Poll> polls = pollRepository.findByGroupIdIn(userGroups);
+
+        // Sort polls by timeCreated in descending order in the service layer
+        return polls.stream()
+                .sorted((poll1, poll2) -> poll2.getTimeCreated().compareTo(poll1.getTimeCreated()))
+                .map(Poll::toPollResponse).toList();
     }
 }
