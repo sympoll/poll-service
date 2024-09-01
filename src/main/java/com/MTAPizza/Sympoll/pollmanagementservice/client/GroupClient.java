@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.PostExchange;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,6 @@ public interface GroupClient {
     @GetExchange("/api/group/all-user-groups")
     ResponseEntity<UserGroupsResponse> getAllUserGroups(@RequestParam UUID userId);
 
-    @GetExchange("/api/group/group-name-list")
+    @PostExchange("/api/group/group-name-list")
     ResponseEntity<List<GroupNameResponse>> getGroupNameList(@RequestBody List<String> groupIds);
 }

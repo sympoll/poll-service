@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.PostExchange;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,6 @@ public interface UserClient {
     @GetExchange("/api/user/by-user-id")
     ResponseEntity<UserResponse> getUserById(@RequestParam UUID userId);
 
-    @GetExchange("/api/user/username-list")
+    @PostExchange("/api/user/username-list")
     ResponseEntity<List<UsernameResponse>> getUserNameList(@RequestBody List<UUID> userIds);
 }
