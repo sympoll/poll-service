@@ -1,6 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.UserGroupsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
@@ -397,5 +398,24 @@ class PollManagementServiceApplicationTests {
 
         /* Verify vote count */
         assertEquals(0, voteResponse.voteCount(), "Expected 0 vote count");
+    }
+
+    @Test
+    @Order(9)
+    void shouldGetAllUserPolls() {
+        // Check that response is in fact 200
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .queryParam("userId", userId)
+                .when()
+                .get("/api/poll/all-user-polls")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        List<PollResponse> pollsResponse = response.as(new TypeRef<>() {});
+
+        /* Verify vote count */
+        assertEquals(4, pollsResponse.size(), "Expected 4 polls");
     }
 }

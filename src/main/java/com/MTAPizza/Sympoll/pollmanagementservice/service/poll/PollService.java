@@ -198,15 +198,16 @@ public class PollService {
      * Polls are returned sorted in descending order by creation date.
      */
     public List<PollResponse> getAllUserPolls(UUID userId) {
-        List<String> userGroups = Objects.requireNonNull(
-                groupClient.getAllUserGroups(userId)
-                        .getBody().userGroups());
+        validator.validateGetAllUserGroups(userId);
+            List<String> userGroups = Objects.requireNonNull(
+                    Objects.requireNonNull(groupClient.getAllUserGroups(userId)
+                            .getBody()).userGroups());
 
-        List<Poll> polls = pollRepository.findByGroupIdIn(userGroups);
+            List<Poll> polls = pollRepository.findByGroupIdIn(userGroups);
 
-        // Sort polls by timeCreated in descending order in the service layer
-        return polls.stream()
-                .sorted((poll1, poll2) -> poll2.getTimeCreated().compareTo(poll1.getTimeCreated()))
-                .map(Poll::toPollResponse).toList();
+            // Sort polls by timeCreated in descending order in the service layer
+            return polls.stream()
+                    .sorted((poll1, poll2) -> poll2.getTimeCreated().compareTo(poll1.getTimeCreated()))
+                    .map(Poll::toPollResponse).toList();
     }
 }

@@ -48,15 +48,15 @@ public class GroupClientStub {
     }
 
     private static void stubGetAllUserGroups(UUID userId) {
-        stubFor(get(urlEqualTo("/api/group/all-user-groups"))
+        stubFor(get(urlPathEqualTo("/api/group/all-user-groups"))
                 .withQueryParam("userId", equalTo(userId.toString()))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withBody("""
-                            {
-                                "userGroups": ["social", "communication", "movies"]
-                            }
-                            """)));
+                        {
+                            "userGroups": ["social", "communication", "movies", "123"]
+                        }
+                        """)));
     }
 }
