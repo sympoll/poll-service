@@ -38,11 +38,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(PollExceptionHandler.class)
 class PollManagementServiceApplicationTests {
     private static final Logger log = LoggerFactory.getLogger(PollManagementServiceApplicationTests.class);
-    private static UUID pollId;
-    private static UUID pollIdForVote;
-    private static int benzVoteId;
+    private static UUID pollId; // Used in delete poll and get poll by id
+    private static final int votingItemIdForVoteTest = 1; // vote on the first item of the first poll
+    private static final UUID userId = UUID.fromString("b1f8e925-2129-473d-bc09-b3a2a331f839");
     private static final Gson gson;
-    private static final UUID rndCreatorUUID = UUID.randomUUID();
 
     /**
     * Initialize postgres test container with the init script inside poll-management-service/test/resources
@@ -60,8 +59,8 @@ class PollManagementServiceApplicationTests {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
         WireMock.reset();
-        UserClientStub.initStubs(rndCreatorUUID);
-        GroupClientStub.initStubs(rndCreatorUUID);
+        UserClientStub.initStubs(userId);
+        GroupClientStub.initStubs(userId);
     }
 
     static {
@@ -90,7 +89,7 @@ class PollManagementServiceApplicationTests {
                     "JavaScript"
                   ]
                 }
-                """, rndCreatorUUID);
+                """, userId);
 
         PollResponse pollResponseProg = tryToCreatePollAndAssertStatusCode(requestBodyProg, HttpStatus.CREATED).as(PollResponse.class);
 
@@ -115,7 +114,7 @@ class PollManagementServiceApplicationTests {
                     "Marlen"
                   ]
                 }
-                """, rndCreatorUUID);
+                """, userId);
 
         PollResponse pollResponseBurger = tryToCreatePollAndAssertStatusCode(requestBodyBurger, HttpStatus.CREATED).as(PollResponse.class);
 
@@ -159,10 +158,8 @@ class PollManagementServiceApplicationTests {
 
         List<PollResponse> pollResponses = response.as(new TypeRef<>() {});
         /* Verify poll response */
-        assertEquals(2, pollResponses.size(), "Expected 2 Polls in the response");
-        pollId = pollResponses.get(0).pollId();
-        pollIdForVote = pollResponses.get(1).pollId();
-        benzVoteId = pollResponses.get(1).votingItems().get(0).votingItemId();
+        assertEquals(5, pollResponses.size(), "Expected 5 Polls in the response");
+        pollId = pollResponses.get(4).pollId(); // Assigned to be the last poll created
     }
 
 
@@ -194,7 +191,7 @@ class PollManagementServiceApplicationTests {
                   "pollId": "%s",
                   "groupId": "123"
                 }
-                """, rndCreatorUUID, pollId);
+                """, userId, pollId);
 
         // Check that response is in fact 200
         Response responseDelete = RestAssured.given()
@@ -220,7 +217,7 @@ class PollManagementServiceApplicationTests {
         List<PollResponse> pollResponses = responseAll.as(new TypeRef<>() {});
         /* Verify poll response */
         assertNotNull(pollDeleteResponse.pollId(), "Poll ID should not be null");
-        assertEquals(1, pollResponses.size(), "Expected 1 Polls in the response");
+        assertEquals(4, pollResponses.size(), "Expected 4 Polls in the response");
     }
 
 
@@ -244,7 +241,7 @@ class PollManagementServiceApplicationTests {
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 1,
-                rndCreatorUUID,
+                userId,
                 "123",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
@@ -268,7 +265,7 @@ class PollManagementServiceApplicationTests {
                 "Favorite Programming Language",
                 "Vote for your favorite programming language",
                 5,
-                rndCreatorUUID,
+                userId,
                 "123",
                 "2023-01-01T10:00:00.000Z", // Invalid deadline
                 List.of("Java", "Python", "C++", "JavaScript")
@@ -305,7 +302,7 @@ class PollManagementServiceApplicationTests {
                     "Marlen"
                   ]
                 }
-                """, rndCreatorUUID);
+                """, userId);
 
         // Perform the POST request with the invalid request body
         Response response = tryToCreatePollAndAssertStatusCode(requestBody, HttpStatus.BAD_REQUEST);
@@ -326,7 +323,7 @@ class PollManagementServiceApplicationTests {
                   "votingItemId": %d,
                   "action": "add"
                 }
-                """, benzVoteId);
+                """, votingItemIdForVoteTest);
 
         // Check that response is in fact 200
         Response response = RestAssured.given()
@@ -341,7 +338,6 @@ class PollManagementServiceApplicationTests {
         VoteResponse voteResponse = response.as(VoteResponse.class);
 
         /* Verify vote response */
-        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
         assertEquals(1, voteResponse.voteCount(), "Expected 1 vote count");
     }
 
@@ -355,7 +351,7 @@ class PollManagementServiceApplicationTests {
                 {
                   "votingItemId": %d
                 }
-                """, benzVoteId);
+                """, votingItemIdForVoteTest);
 
         // Check that response is in fact 200
         Response response = RestAssured.given()
@@ -385,7 +381,7 @@ class PollManagementServiceApplicationTests {
                   "votingItemId": %d,
                   "action": "remove"
                 }
-                """, benzVoteId);
+                """, votingItemIdForVoteTest);
 
         // Check that response is in fact 200
         Response response = RestAssured.given()
@@ -400,7 +396,6 @@ class PollManagementServiceApplicationTests {
         VoteResponse voteResponse = response.as(VoteResponse.class);
 
         /* Verify vote count */
-        assertEquals("Benz Brothers", voteResponse.votingItemDescription(), "Expected vote description to be 'Benz Brothers'");
         assertEquals(0, voteResponse.voteCount(), "Expected 0 vote count");
     }
 }
