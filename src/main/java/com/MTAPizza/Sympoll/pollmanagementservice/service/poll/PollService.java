@@ -2,26 +2,28 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
 import com.MTAPizza.Sympoll.pollmanagementservice.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,25 +35,63 @@ public class PollService {
     private final GroupClient groupClient;
 
     /**
-     * Get poll response DTO of the poll, including the creator name.
+     * Given a list of polls, fetch their creator names and group names from user and group services
      *
-     * @param poll Poll to convert.
-     * @return DTO of PollResponse with a creator name.
+     * @param polls Polls to convert.
+     * @return DTO list of PollResponses with creator and group name.
      */
-    private PollResponse getPollResponseWithCreatorName(Poll poll) {
-        log.info("Sending request to get username from user service");
-        poll.setCreatorName(
-                Objects.requireNonNull(
-                        userClient.getUserById(poll.getCreatorId())
-                                .getBody()).username());
+    public List<PollResponse> getPollResponsesWithCreatorAndGroupNames(List<Poll> polls) {
+        // Collect all creator and group IDs from the list of polls
+        Set<UUID> creatorIds = polls.stream()
+                .map(Poll::getCreatorId)
+                .collect(Collectors.toSet());
+        Set<String> groupIds = polls.stream()
+                .map(Poll::getGroupId)
+                .collect(Collectors.toSet());
 
-        log.info("Sending request to get group name from group service");
-        poll.setGroupName(
-                Objects.requireNonNull(
-                        groupClient.getGroupNameById(poll.getGroupId())
-                                .getBody()).groupName());
+        // Fetch all creator names and group names concurrently
+        CompletableFuture<Map<UUID, String>> creatorNamesFuture = CompletableFuture.supplyAsync(() -> getCreatorNames(creatorIds));
+        CompletableFuture<Map<String, String>> groupNamesFuture = CompletableFuture.supplyAsync(() -> getGroupNames(groupIds));
 
-        return poll.toPollResponse();
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorNamesFuture, groupNamesFuture);
+        combinedFuture.join();
+
+        // Combine results into a map
+        Map<UUID, String> creatorNames = creatorNamesFuture.join();
+        Map<String, String> groupNames = groupNamesFuture.join();
+
+        // Map each poll to its response with the fetched creator and group names
+        return polls.stream()
+                .map(poll -> {
+                    poll.setCreatorName(creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"));
+                    poll.setGroupName(groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"));
+                    return poll.toPollResponse();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Map<UUID, String> getCreatorNames(Set<UUID> creatorIds) {
+        try {
+            log.info("Batch fetching creator names from user service");
+            ResponseEntity<List<UsernameResponse>> response = userClient.getUserNameList(new ArrayList<>(creatorIds));
+            return Objects.requireNonNull(response.getBody()).stream()
+                    .collect(Collectors.toMap(UsernameResponse::userId, UsernameResponse::username));
+        } catch (Exception e) {
+            log.error("Failed to fetch creator names", e);
+            return Collections.emptyMap();
+        }
+    }
+
+    private Map<String, String> getGroupNames(Set<String> groupIds) {
+        try {
+            log.info("Batch fetching group names from group service");
+            ResponseEntity<List<GroupNameResponse>> response = groupClient.getGroupNameList(new ArrayList<>(groupIds));
+            return Objects.requireNonNull(response.getBody()).stream()
+                    .collect(Collectors.toMap(GroupNameResponse::groupId, GroupNameResponse::groupName));
+        } catch (Exception e) {
+            log.error("Failed to fetch group names", e);
+            return Collections.emptyMap();
+        }
     }
 
     /**
@@ -76,7 +116,15 @@ public class PollService {
 
         pollRepository.save(poll);
         log.info("POLL: {} by USER: {} was created.", poll.getPollId(), poll.getCreatorId());
-        return getPollResponseWithCreatorName(poll);
+
+        // Wrap the poll in a list to use batch fetching logic
+        List<Poll> singlePollList = Collections.singletonList(poll);
+
+        // Fetch and return the poll response with creator and group names
+        List<PollResponse> pollResponses = getPollResponsesWithCreatorAndGroupNames(singlePollList);
+
+        // Return the first (and only) PollResponse from the list
+        return pollResponses.get(0);
     }
 
     /**
@@ -111,16 +159,18 @@ public class PollService {
     }
 
     /**
-     * Retrieves all polls from the repository and maps them to PollResponse DTOs.
+     * Retrieves all polls from the repository.
+     * Retrieves their creator name and group name.
      *
-     * @return List of PollResponse DTOs containing details of all polls.
+     * @return List of poll responses in descending order by creation date.
      */
     public List<PollResponse> getAllPolls() {
         log.info("Retrieving all polls in database...");
-        return pollRepository
-                .findAll()
+        List<Poll> polls =  pollRepository.findAll();
+
+        return getPollResponsesWithCreatorAndGroupNames(polls)
                 .stream()
-                .map(this::getPollResponseWithCreatorName)
+                .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                 .toList();
     }
 
@@ -150,7 +200,17 @@ public class PollService {
         validator.validateGetPollByIdRequest(pollId);
 
         log.info("Retrieving poll with ID: {}", pollId);
-        return getPollResponseWithCreatorName(pollRepository.getReferenceById(pollId));
+
+        Poll poll = pollRepository.getReferenceById(pollId);
+
+        // Wrap the poll in a list to use batch fetching logic
+        List<Poll> singlePollList = Collections.singletonList(poll);
+
+        // Fetch and return the poll response with creator and group names
+        List<PollResponse> pollResponses = getPollResponsesWithCreatorAndGroupNames(singlePollList);
+
+        // Return the first (and only) PollResponse from the list
+        return pollResponses.get(0);
     }
 
     /**
@@ -161,12 +221,15 @@ public class PollService {
         validator.validateGetPollsByGroupIdRequest(groupId);
 
         log.info("Retrieving all polls by group ID: {}", groupId);
-        return pollRepository
+        List<Poll> polls = pollRepository
                 .findAll()
                 .stream()
                 .filter(poll -> poll.getGroupId().equals(groupId))
-                .sorted() // Sort by date, most recent poll first.
-                .map(this::getPollResponseWithCreatorName)
+                .toList();
+
+        return getPollResponsesWithCreatorAndGroupNames(polls)
+                .stream()
+                .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                 .toList();
     }
 
@@ -190,7 +253,10 @@ public class PollService {
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
-        return resPolls.stream().sorted().map(this::getPollResponseWithCreatorName).toList();
+        return getPollResponsesWithCreatorAndGroupNames(resPolls)
+                .stream()
+                .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
+                .toList();
     }
 
     /**
@@ -198,7 +264,6 @@ public class PollService {
      * Polls are returned sorted in descending order by creation date.
      */
     public List<PollResponse> getAllUserPolls(UUID userId) {
-        validator.validateGetAllUserGroups(userId);
             List<String> userGroups = Objects.requireNonNull(
                     Objects.requireNonNull(groupClient.getAllUserGroups(userId)
                             .getBody()).userGroups());
@@ -206,8 +271,8 @@ public class PollService {
             List<Poll> polls = pollRepository.findByGroupIdIn(userGroups);
 
             // Sort polls by timeCreated in descending order in the service layer
-            return polls.stream()
-                    .sorted((poll1, poll2) -> poll2.getTimeCreated().compareTo(poll1.getTimeCreated()))
-                    .map(Poll::toPollResponse).toList();
+            return getPollResponsesWithCreatorAndGroupNames(polls)
+                    .stream().sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
+                    .toList();
     }
 }

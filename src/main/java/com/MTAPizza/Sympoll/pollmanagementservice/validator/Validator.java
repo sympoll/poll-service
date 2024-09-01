@@ -65,10 +65,6 @@ public class Validator {
         validatePollIdExist(pollDeleteRequest.pollId());
     }
 
-    public void validateGetAllUserGroups(UUID userId){
-        validateUserIdExist(userId);
-    }
-
     private void validateAllowedVotingItems(int nofVotingItems, PollCreateRequest poll) {
         if (poll.nofAnswersAllowed() > nofVotingItems) {
             log.error("User {} tried to create a poll but an number of answers allowed was given.", poll.creatorId());
