@@ -2,12 +2,15 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
+import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.PollChoiceRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.PollChoiceResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -33,15 +36,18 @@ public class PollService {
     private final Validator validator;
     private final UserClient userClient;
     private final GroupClient groupClient;
+    private final VoteClient voteClient;
 
     /**
-     * Given a list of polls, fetch their creator names and group names from user and group services
+     * Converts a list of Polls to PollResponses including creator and group names,
+     * and optionally, the user's chosen voting items if a userId is provided.
      *
-     * @param polls Polls to convert.
-     * @return DTO list of PollResponses with creator and group name.
+     * @param polls The list of Polls to convert.
+     * @param userId The UUID of the user to fetch choices for; if null, fetches without choices.
+     * @return A list of PollResponses with added details.
      */
-    public List<PollResponse> getPollResponsesWithCreatorAndGroupNames(List<Poll> polls) {
-        // Collect all creator and group IDs from the list of polls
+    public List<PollResponse> createPollResponsesWithFullDetails(List<Poll> polls, UUID userId) {
+        // Collect all unique creator and group IDs
         Set<UUID> creatorIds = polls.stream()
                 .map(Poll::getCreatorId)
                 .collect(Collectors.toSet());
@@ -49,27 +55,68 @@ public class PollService {
                 .map(Poll::getGroupId)
                 .collect(Collectors.toSet());
 
-        // Fetch all creator names and group names concurrently
+        // Fetch creator and group names asynchronously
         CompletableFuture<Map<UUID, String>> creatorNamesFuture = CompletableFuture.supplyAsync(() -> getCreatorNames(creatorIds));
         CompletableFuture<Map<String, String>> groupNamesFuture = CompletableFuture.supplyAsync(() -> getGroupNames(groupIds));
 
         CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorNamesFuture, groupNamesFuture);
+        CompletableFuture<List<Integer>> votingItemsFuture = null;
+
+        // Fetch user's choices if userId is provided
+        if (userId != null) {
+            Set<Integer> votingItemIds = polls.stream()
+                    .flatMap(poll -> poll.getVotingItems().stream())
+                    .map(VotingItem::getVotingItemId)
+                    .collect(Collectors.toSet());
+            votingItemsFuture = CompletableFuture.supplyAsync(() -> fetchUserVotedItems(votingItemIds, userId));
+            combinedFuture = CompletableFuture.allOf(combinedFuture, votingItemsFuture);
+        }
+
+        // Wait for all futures to complete
         combinedFuture.join();
 
-        // Combine results into a map
+        // Get results from futures
         Map<UUID, String> creatorNames = creatorNamesFuture.join();
         Map<String, String> groupNames = groupNamesFuture.join();
+        List<Integer> chosenVotingItems = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyList();
 
-        // Map each poll to its response with the fetched creator and group names
+        // Create poll responses
         return polls.stream()
-                .map(poll -> {
-                    poll.setCreatorName(creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"));
-                    poll.setGroupName(groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"));
-                    return poll.toPollResponse();
-                })
+                .map(poll -> new PollResponse(
+                        poll.getPollId(),
+                        poll.getTitle(),
+                        poll.getDescription(),
+                        poll.getNofAnswersAllowed(),
+                        poll.getCreatorId(),
+                        creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"),
+                        poll.getGroupId(),
+                        groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"),
+                        chosenVotingItems,
+                        poll.getTimeCreated(),
+                        poll.getTimeUpdated(),
+                        poll.getDeadline(),
+                        poll.getVotingItems().stream()
+                                .sorted(Comparator.comparing(VotingItem::getVotingItemId))
+                                .map(VotingItem::toVotingItemResponse)
+                                .collect(Collectors.toList())
+                ))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Simplified method to fetch PollResponses without user-specific choices.
+     * @param polls The list of Polls to convert.
+     * @return A list of PollResponses.
+     */
+    public List<PollResponse> createPollResponsesWithFullDetails(List<Poll> polls) {
+        return createPollResponsesWithFullDetails(polls, null);
+    }
+
+    /**
+     * Fetches creator names using the user service.
+     * @param creatorIds Set of UUIDs representing creator IDs.
+     * @return A map of creator IDs to creator names.
+     */
     private Map<UUID, String> getCreatorNames(Set<UUID> creatorIds) {
         try {
             log.info("Batch fetching creator names from user service");
@@ -82,6 +129,11 @@ public class PollService {
         }
     }
 
+    /**
+     * Fetches group names using the group service.
+     * @param groupIds Set of strings representing group IDs.
+     * @return A map of group IDs to group names.
+     */
     private Map<String, String> getGroupNames(Set<String> groupIds) {
         try {
             log.info("Batch fetching group names from group service");
@@ -91,6 +143,25 @@ public class PollService {
         } catch (Exception e) {
             log.error("Failed to fetch group names", e);
             return Collections.emptyMap();
+        }
+    }
+
+    /**
+     * Fetches the IDs of the voting items chosen by a specific user.
+     * This function communicates with the vote service to retrieve the user's choices.
+     *
+     * @param votingItemIds The set of voting item IDs to check against the user's choices.
+     * @param userId The unique identifier of the user whose voting choices are being queried.
+     * @return A list of voting item IDs chosen by the user, or an empty list if an error occurs.
+     */
+    private List<Integer> fetchUserVotedItems(Set<Integer> votingItemIds, UUID userId) {
+        log.info("Batch fetching chosen voting items from vote service for user: {}", userId);
+        try {
+            ResponseEntity<PollChoiceResponse> response = voteClient.getPollVotesByUser(new PollChoiceRequest(new ArrayList<>(votingItemIds), userId));
+            return Objects.requireNonNull(response.getBody(), "No body in response").votingItemIds();
+        } catch (Exception e) {
+            log.error("Failed to fetch chosen vote items for user: {}", userId, e);
+            return Collections.emptyList();
         }
     }
 
@@ -121,7 +192,7 @@ public class PollService {
         List<Poll> singlePollList = Collections.singletonList(poll);
 
         // Fetch and return the poll response with creator and group names
-        List<PollResponse> pollResponses = getPollResponsesWithCreatorAndGroupNames(singlePollList);
+        List<PollResponse> pollResponses = createPollResponsesWithFullDetails(singlePollList);
 
         // Return the first (and only) PollResponse from the list
         return pollResponses.get(0);
@@ -168,7 +239,7 @@ public class PollService {
         log.info("Retrieving all polls in database...");
         List<Poll> polls =  pollRepository.findAll();
 
-        return getPollResponsesWithCreatorAndGroupNames(polls)
+        return createPollResponsesWithFullDetails(polls)
                 .stream()
                 .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                 .toList();
@@ -207,7 +278,7 @@ public class PollService {
         List<Poll> singlePollList = Collections.singletonList(poll);
 
         // Fetch and return the poll response with creator and group names
-        List<PollResponse> pollResponses = getPollResponsesWithCreatorAndGroupNames(singlePollList);
+        List<PollResponse> pollResponses = createPollResponsesWithFullDetails(singlePollList);
 
         // Return the first (and only) PollResponse from the list
         return pollResponses.get(0);
@@ -216,8 +287,11 @@ public class PollService {
     /**
      * Get a list of all polls of a group.
      * Sorted by creation date, newest first.
+     * @param groupId The group id to fetch the polls from
+     * @param userId Optional parameter that may be null (depending on if the user provided the query parameter)
+     *      *               If provided, polls will return along with the user's choices.
      */
-    public List<PollResponse> getPollsByGroupId(String groupId) {
+    public List<PollResponse> getPollsByGroupId(String groupId, UUID userId) {
         validator.validateGetPollsByGroupIdRequest(groupId);
 
         log.info("Retrieving all polls by group ID: {}", groupId);
@@ -227,7 +301,7 @@ public class PollService {
                 .filter(poll -> poll.getGroupId().equals(groupId))
                 .toList();
 
-        return getPollResponsesWithCreatorAndGroupNames(polls)
+        return createPollResponsesWithFullDetails(polls, userId)
                 .stream()
                 .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                 .toList();
@@ -236,8 +310,12 @@ public class PollService {
     /**
      * Get a list of all polls of multiple groups.
      * Sorted by creation date, newest first.
+     *
+     * @param groupIds The group ids to fetch the polls from
+     * @param userId Optional parameter that may be null (depending on if the user provided the query parameter)
+     *               If provided, polls will return along with the user's choices.
      */
-    public List<PollResponse> getPollsByMultipleGroupIds(List<String> groupIds) {
+    public List<PollResponse> getPollsByMultipleGroupIds(List<String> groupIds, UUID userId) {
         validator.validateGetPollsByMultipleGroupIdsRequest(groupIds);
 
         log.info("Retrieving all polls by multiple group IDs: {}", groupIds);
@@ -253,7 +331,7 @@ public class PollService {
         // First Sort the result polls by date, most recent poll first,
         // then map each Poll to a PollResponse object,
         // and return the result.
-        return getPollResponsesWithCreatorAndGroupNames(resPolls)
+        return createPollResponsesWithFullDetails(resPolls, userId)
                 .stream()
                 .sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                 .toList();
@@ -271,7 +349,7 @@ public class PollService {
             List<Poll> polls = pollRepository.findByGroupIdIn(userGroups);
 
             // Sort polls by timeCreated in descending order in the service layer
-            return getPollResponsesWithCreatorAndGroupNames(polls)
+            return createPollResponsesWithFullDetails(polls, userId)
                     .stream().sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                     .toList();
     }

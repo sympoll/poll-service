@@ -9,7 +9,6 @@ import org.springframework.web.service.annotation.PostExchange;
 import java.util.List;
 
 public interface VoteClient {
-
     @PostExchange("/api/vote/user-choices")
-    ResponseEntity<List<PollChoiceResponse>> getPollVotesByUser(@RequestBody PollChoiceRequest pollChoiceRequest);
+    ResponseEntity<PollChoiceResponse> getPollVotesByUser(@RequestBody PollChoiceRequest pollChoiceRequest);
 }

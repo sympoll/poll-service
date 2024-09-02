@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -74,6 +75,7 @@ public class Poll implements Comparable<Poll>{
                 creatorName,
                 groupId,
                 groupName,
+                Collections.emptyList(),
                 timeCreated,
                 timeUpdated,
                 deadline,
