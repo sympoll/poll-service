@@ -60,15 +60,18 @@ public class PollService {
         CompletableFuture<Map<String, String>> groupNamesFuture = CompletableFuture.supplyAsync(() -> getGroupNames(groupIds));
 
         CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorNamesFuture, groupNamesFuture);
-        CompletableFuture<List<Integer>> votingItemsFuture = null;
+        CompletableFuture<Map<UUID, List<Integer>>> votingItemsFuture = null;
 
         // Fetch user's choices if userId is provided
         if (userId != null) {
-            Set<Integer> votingItemIds = polls.stream()
-                    .flatMap(poll -> poll.getVotingItems().stream())
-                    .map(VotingItem::getVotingItemId)
-                    .collect(Collectors.toSet());
-            votingItemsFuture = CompletableFuture.supplyAsync(() -> fetchUserVotedItems(votingItemIds, userId));
+            Map<UUID, Set<Integer>> pollToVotingItemIdsMap = polls.stream()
+                    .collect(Collectors.toMap(
+                            Poll::getPollId,
+                            poll -> poll.getVotingItems().stream()
+                                    .map(VotingItem::getVotingItemId)
+                                    .collect(Collectors.toSet())
+                    ));
+            votingItemsFuture = CompletableFuture.supplyAsync(() -> fetchUserVotedItems(pollToVotingItemIdsMap, userId));
             combinedFuture = CompletableFuture.allOf(combinedFuture, votingItemsFuture);
         }
 
@@ -78,28 +81,31 @@ public class PollService {
         // Get results from futures
         Map<UUID, String> creatorNames = creatorNamesFuture.join();
         Map<String, String> groupNames = groupNamesFuture.join();
-        List<Integer> chosenVotingItems = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyList();
+        Map<UUID, List<Integer>> userVotedItems = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyMap();
 
         // Create poll responses
         return polls.stream()
-                .map(poll -> new PollResponse(
-                        poll.getPollId(),
-                        poll.getTitle(),
-                        poll.getDescription(),
-                        poll.getNofAnswersAllowed(),
-                        poll.getCreatorId(),
-                        creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"),
-                        poll.getGroupId(),
-                        groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"),
-                        chosenVotingItems,
-                        poll.getTimeCreated(),
-                        poll.getTimeUpdated(),
-                        poll.getDeadline(),
-                        poll.getVotingItems().stream()
-                                .sorted(Comparator.comparing(VotingItem::getVotingItemId))
-                                .map(VotingItem::toVotingItemResponse)
-                                .collect(Collectors.toList())
-                ))
+                .map(poll -> {
+                    List<Integer> chosenVotingItems = userVotedItems.getOrDefault(poll.getPollId(), Collections.emptyList());
+                    return new PollResponse(
+                            poll.getPollId(),
+                            poll.getTitle(),
+                            poll.getDescription(),
+                            poll.getNofAnswersAllowed(),
+                            poll.getCreatorId(),
+                            creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"),
+                            poll.getGroupId(),
+                            groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"),
+                            chosenVotingItems,
+                            poll.getTimeCreated(),
+                            poll.getTimeUpdated(),
+                            poll.getDeadline(),
+                            poll.getVotingItems().stream()
+                                    .sorted(Comparator.comparing(VotingItem::getVotingItemId))
+                                    .map(VotingItem::toVotingItemResponse)
+                                    .collect(Collectors.toList())
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -150,18 +156,33 @@ public class PollService {
      * Fetches the IDs of the voting items chosen by a specific user.
      * This function communicates with the vote service to retrieve the user's choices.
      *
-     * @param votingItemIds The set of voting item IDs to check against the user's choices.
+     * @param pollToVotingItemIdsMap A map of poll IDs to the set of voting item IDs for each poll.
      * @param userId The unique identifier of the user whose voting choices are being queried.
-     * @return A list of voting item IDs chosen by the user, or an empty list if an error occurs.
+     * @return A map of poll IDs to lists of voting item IDs chosen by the user, or an empty map if an error occurs.
      */
-    private List<Integer> fetchUserVotedItems(Set<Integer> votingItemIds, UUID userId) {
+    private Map<UUID, List<Integer>> fetchUserVotedItems(Map<UUID, Set<Integer>> pollToVotingItemIdsMap, UUID userId) {
         log.info("Batch fetching chosen voting items from vote service for user: {}", userId);
         try {
-            ResponseEntity<PollChoiceResponse> response = voteClient.getPollVotesByUser(new PollChoiceRequest(new ArrayList<>(votingItemIds), userId));
-            return Objects.requireNonNull(response.getBody(), "No body in response").votingItemIds();
+            // Flatten the voting item IDs from all polls
+            Set<Integer> allVotingItemIds = pollToVotingItemIdsMap.values().stream()
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet());
+
+            // Fetch all user choices for the relevant voting items
+            ResponseEntity<PollChoiceResponse> response = voteClient.getPollVotesByUser(new PollChoiceRequest(new ArrayList<>(allVotingItemIds), userId));
+            List<Integer> chosenVotingItems = Objects.requireNonNull(response.getBody(), "No body in response").votingItemIds();
+
+            // Map chosen voting items to poll IDs
+            return pollToVotingItemIdsMap.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> entry.getValue().stream()
+                                    .filter(chosenVotingItems::contains)
+                                    .collect(Collectors.toList())
+                    ));
         } catch (Exception e) {
             log.error("Failed to fetch chosen vote items for user: {}", userId, e);
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
     }
 
