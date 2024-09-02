@@ -9,8 +9,8 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.PollChoiceRequest;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.PollChoiceResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -40,7 +40,7 @@ public class PollService {
 
     /**
      * Converts a list of Polls to PollResponses including creator and group names,
-     * and optionally, the user's chosen voting items if a userId is provided.
+     * and optionally, the user's checked voting items if a userId is provided.
      *
      * @param polls The list of Polls to convert.
      * @param userId The UUID of the user to fetch choices for; if null, fetches without choices.
@@ -86,11 +86,11 @@ public class PollService {
         // Create poll responses
         return polls.stream()
                 .map(poll -> {
-                    List<Integer> chosenVotingItems = userVotedItems.getOrDefault(poll.getPollId(), Collections.emptyList());
+                    List<Integer> checkedVotingItems = userVotedItems.getOrDefault(poll.getPollId(), Collections.emptyList());
                     String creatorName = creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator");
                     String groupName = groupNames.getOrDefault(poll.getGroupId(), "Unknown Group");
 
-                    return poll.toPollResponse(creatorName, groupName, chosenVotingItems);
+                    return poll.toPollResponse(creatorName, groupName, checkedVotingItems);
                 })
                 .collect(Collectors.toList());
     }
@@ -139,15 +139,15 @@ public class PollService {
     }
 
     /**
-     * Fetches the IDs of the voting items chosen by a specific user.
+     * Fetches the IDs of the voting items checked by a specific user.
      * This function communicates with the vote service to retrieve the user's choices.
      *
      * @param pollToVotingItemIdsMap A map of poll IDs to the set of voting item IDs for each poll.
      * @param userId The unique identifier of the user whose voting choices are being queried.
-     * @return A map of poll IDs to lists of voting item IDs chosen by the user, or an empty map if an error occurs.
+     * @return A map of poll IDs to lists of voting item IDs checked by the user, or an empty map if an error occurs.
      */
     private Map<UUID, List<Integer>> fetchUserVotedItems(Map<UUID, Set<Integer>> pollToVotingItemIdsMap, UUID userId) {
-        log.info("Batch fetching chosen voting items from vote service for user: {}", userId);
+        log.info("Batch fetching checked voting items from vote service for user: {}", userId);
         try {
             // Flatten the voting item IDs from all polls
             Set<Integer> allVotingItemIds = pollToVotingItemIdsMap.values().stream()
@@ -155,19 +155,19 @@ public class PollService {
                     .collect(Collectors.toSet());
 
             // Fetch all user choices for the relevant voting items
-            ResponseEntity<PollChoiceResponse> response = voteClient.getPollVotesByUser(new PollChoiceRequest(new ArrayList<>(allVotingItemIds), userId));
-            List<Integer> chosenVotingItems = Objects.requireNonNull(response.getBody(), "No body in response").votingItemIds();
+            ResponseEntity<VotingItemsCheckedResponse> response = voteClient.getPollVotesByUser(new VotingItemsCheckedRequest(new ArrayList<>(allVotingItemIds), userId));
+            List<Integer> checkedVotingItems = Objects.requireNonNull(response.getBody(), "No body in response").votingItemIds();
 
-            // Map chosen voting items to poll IDs
+            // Map checked voting items to poll IDs
             return pollToVotingItemIdsMap.entrySet().stream()
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             entry -> entry.getValue().stream()
-                                    .filter(chosenVotingItems::contains)
+                                    .filter(checkedVotingItems::contains)
                                     .collect(Collectors.toList())
                     ));
         } catch (Exception e) {
-            log.error("Failed to fetch chosen vote items for user: {}", userId, e);
+            log.error("Failed to fetch checked vote items for user: {}", userId, e);
             return Collections.emptyMap();
         }
     }
