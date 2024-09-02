@@ -12,4 +12,7 @@ import java.util.UUID;
 @Repository
 public interface PollRepository extends JpaRepository<Poll, UUID> {
     List<Poll> findByGroupIdIn(List<String> groupIds);
+    List<Poll> findByGroupId(String groupId);
+    void deleteByIdIn(List<UUID> pollIds);
+
 }

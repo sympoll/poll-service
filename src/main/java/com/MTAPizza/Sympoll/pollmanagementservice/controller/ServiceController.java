@@ -1,5 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
@@ -146,5 +148,12 @@ public class ServiceController {
     public VoteCountResponse getVoteCount(@RequestBody VoteCountRequest voteCountRequest) {
         log.info("Received request to retrieve vote count");
         return votingItemService.getVoteCount(voteCountRequest);
+    }
+
+    @DeleteMapping("by-group-id")
+    @ResponseStatus(HttpStatus.OK)
+    public DeleteGroupPollsResponse deleteGroupPolls(@RequestBody DeleteGroupPollsRequest deleteGroupPollsRequest) {
+        log.info("Received request to delete all group's polls");
+        return pollService.deleteGroupPolls(deleteGroupPollsRequest);
     }
 }
