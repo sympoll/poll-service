@@ -75,6 +75,19 @@ public class ServiceController {
         return pollService.getPollsByGroupId(groupId);
     }
 
+
+    /**
+     * Returns the given user's polls from all groups he is a member of.
+     * @param userId User ID to fetch his polls
+     * @return List of polls in descending order by creation date
+     */
+    @GetMapping("/all-user-polls")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PollResponse> getAllUserPolls(@RequestParam UUID userId){
+        log.info("Received request to get all polls of user with ID: {}", userId);
+        return pollService.getAllUserPolls(userId);
+    }
+
     /**
      * Fetch all polls of multiple groups.
      * @param groupIds List of group IDs to fetch their polls.
