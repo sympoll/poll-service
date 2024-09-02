@@ -31,6 +31,22 @@ public class VotingItem {
         return new VotingItemResponse(
                 votingItemId,
                 description,
+                false,
+                voteCount
+        );
+    }
+
+    /**
+     * Converts the VotingItem to a VotingItemResponse, setting the chosen field as specified.
+     *
+     * @param isChosen Whether this voting item is chosen by the user.
+     * @return A VotingItemResponse with the chosen field set.
+     */
+    public VotingItemResponse toVotingItemResponseWithChosen(boolean isChosen) {
+        return new VotingItemResponse(
+                votingItemId,
+                description,
+                isChosen, // Set the chosen field based on the passed argument
                 voteCount
         );
     }

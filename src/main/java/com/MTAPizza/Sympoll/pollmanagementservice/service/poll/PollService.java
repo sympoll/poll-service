@@ -87,24 +87,10 @@ public class PollService {
         return polls.stream()
                 .map(poll -> {
                     List<Integer> chosenVotingItems = userVotedItems.getOrDefault(poll.getPollId(), Collections.emptyList());
-                    return new PollResponse(
-                            poll.getPollId(),
-                            poll.getTitle(),
-                            poll.getDescription(),
-                            poll.getNofAnswersAllowed(),
-                            poll.getCreatorId(),
-                            creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator"),
-                            poll.getGroupId(),
-                            groupNames.getOrDefault(poll.getGroupId(), "Unknown Group"),
-                            chosenVotingItems,
-                            poll.getTimeCreated(),
-                            poll.getTimeUpdated(),
-                            poll.getDeadline(),
-                            poll.getVotingItems().stream()
-                                    .sorted(Comparator.comparing(VotingItem::getVotingItemId))
-                                    .map(VotingItem::toVotingItemResponse)
-                                    .collect(Collectors.toList())
-                    );
+                    String creatorName = creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator");
+                    String groupName = groupNames.getOrDefault(poll.getGroupId(), "Unknown Group");
+
+                    return poll.toPollResponse(creatorName, groupName, chosenVotingItems);
                 })
                 .collect(Collectors.toList());
     }
