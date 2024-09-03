@@ -282,6 +282,7 @@ public class PollService {
                     .toList();
     }
 
+    @Transactional
     public DeleteGroupPollsResponse deleteGroupPolls(DeleteGroupPollsRequest deleteGroupPollsRequest) {
         List<Poll> groupPolls = pollRepository.findByGroupId(deleteGroupPollsRequest.groupId());
         List<UUID> pollIds = groupPolls.stream().map(Poll::getPollId).toList();
