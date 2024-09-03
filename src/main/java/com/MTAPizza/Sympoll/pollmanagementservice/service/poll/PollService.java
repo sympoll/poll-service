@@ -287,7 +287,7 @@ public class PollService {
         List<UUID> pollIds = groupPolls.stream().map(Poll::getPollId).toList();
 
         sendDeleteRequestToVoteService(groupPolls);
-        pollRepository.deleteByIdIn(pollIds);
+        pollRepository.deleteByPollIdIn(pollIds);
         return new DeleteGroupPollsResponse(pollIds);
     }
 

@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -13,6 +12,5 @@ import java.util.UUID;
 public interface PollRepository extends JpaRepository<Poll, UUID> {
     List<Poll> findByGroupIdIn(List<String> groupIds);
     List<Poll> findByGroupId(String groupId);
-    void deleteByIdIn(List<UUID> pollIds);
-
+    void deleteByPollIdIn(List<UUID> pollIds);
 }
