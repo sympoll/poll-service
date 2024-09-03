@@ -2,12 +2,17 @@ package com.MTAPizza.Sympoll.pollmanagementservice.service.poll;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
+import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -33,6 +38,7 @@ public class PollService {
     private final Validator validator;
     private final UserClient userClient;
     private final GroupClient groupClient;
+    private final VoteClient voteClient;
 
     /**
      * Given a list of polls, fetch their creator names and group names from user and group services
@@ -183,7 +189,7 @@ public class PollService {
     @Transactional
     public PollDeleteResponse deletePoll(PollDeleteRequest pollDeleteRequest) {
         validator.validateDeletePollRequest(pollDeleteRequest);
-
+        // TODO: send request to voting service to delete all corresponding votes.
         log.info("Deleting poll with ID: {}", pollDeleteRequest.pollId());
         pollRepository.deleteById(pollDeleteRequest.pollId());
         log.info("POLL: {} was deleted.", pollDeleteRequest.pollId());
@@ -274,5 +280,37 @@ public class PollService {
             return getPollResponsesWithCreatorAndGroupNames(polls)
                     .stream().sorted(Comparator.comparing(PollResponse::timeCreated).reversed())
                     .toList();
+    }
+
+    /**
+     * Deleting all polls related to the given group id.
+     * @param deleteGroupPollsRequest The given group id.
+     * @return A DTO with the removed poll ids.
+     */
+    @Transactional
+    public DeleteGroupPollsResponse deleteGroupPolls(DeleteGroupPollsRequest deleteGroupPollsRequest) {
+        List<Poll> groupPolls = pollRepository.findByGroupId(deleteGroupPollsRequest.groupId());
+        List<UUID> pollIds = groupPolls.stream().map(Poll::getPollId).toList();
+
+        sendDeleteRequestToVoteService(groupPolls);
+        pollRepository.deleteByPollIdIn(pollIds);
+        return new DeleteGroupPollsResponse(pollIds);
+    }
+
+    /**
+     * 'DeleteGroupPolls' helper, sending delete request to the vote service.
+     * @param groupPolls List of the group's poll ids.
+     */
+    private void sendDeleteRequestToVoteService(List<Poll> groupPolls) {
+        List<Integer> allPollsVotingItemIds = groupPolls.stream()
+                .flatMap(poll -> poll.getVotingItems().stream())
+                .map(VotingItem::getVotingItemId)
+                .collect(Collectors.toList());
+
+        ResponseEntity<DeleteMultipleVotesResponse> respone = voteClient.deleteMultipleVotes(new DeleteMultipleVotesRequest(allPollsVotingItemIds));
+
+        if (!respone.getStatusCode().is2xxSuccessful()) {
+            //TODO throw error.
+        }
     }
 }
