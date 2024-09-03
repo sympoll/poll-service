@@ -150,6 +150,11 @@ public class ServiceController {
         return votingItemService.getVoteCount(voteCountRequest);
     }
 
+    /**
+     * Deleting all polls related to the given group id.
+     * @param deleteGroupPollsRequest The given group id.
+     * @return A DTO with the removed poll ids.
+     */
     @DeleteMapping("by-group-id")
     @ResponseStatus(HttpStatus.OK)
     public DeleteGroupPollsResponse deleteGroupPolls(@RequestBody DeleteGroupPollsRequest deleteGroupPollsRequest) {

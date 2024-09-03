@@ -282,6 +282,11 @@ public class PollService {
                     .toList();
     }
 
+    /**
+     * Deleting all polls related to the given group id.
+     * @param deleteGroupPollsRequest The given group id.
+     * @return A DTO with the removed poll ids.
+     */
     @Transactional
     public DeleteGroupPollsResponse deleteGroupPolls(DeleteGroupPollsRequest deleteGroupPollsRequest) {
         List<Poll> groupPolls = pollRepository.findByGroupId(deleteGroupPollsRequest.groupId());
@@ -292,6 +297,10 @@ public class PollService {
         return new DeleteGroupPollsResponse(pollIds);
     }
 
+    /**
+     * 'DeleteGroupPolls' helper, sending delete request to the vote service.
+     * @param groupPolls List of the group's poll ids.
+     */
     private void sendDeleteRequestToVoteService(List<Poll> groupPolls) {
         List<Integer> allPollsVotingItemIds = groupPolls.stream()
                 .flatMap(poll -> poll.getVotingItems().stream())
