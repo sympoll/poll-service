@@ -11,9 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "polls")
@@ -62,9 +61,18 @@ public class Poll implements Comparable<Poll>{
     private List<VotingItem> votingItems;
 
     /**
-     * @return A PollResponse representation of the poll
+     * Converts the current Poll object into a PollResponse object.
+     * This method populates the PollResponse with detailed information
+     * including the creator's name, group name, and the user's checked voting items.
+     *
+     * @param creatorName        The name of the poll's creator.
+     * @param groupName          The name of the group associated with the poll.
+     * @param checkedVotingItems  A list of voting item IDs that were checked by the user.
+     *                           This is used to set the 'checked' field in the VotingItemResponse.
+     * @return A PollResponse object that represents the current Poll,
+     *         with voting items marked as checked if applicable.
      */
-    public PollResponse toPollResponse(){
+    public PollResponse toPollResponse(String creatorName, String groupName, List<Integer> checkedVotingItems) {
         return new PollResponse(
                 pollId,
                 title,
@@ -77,11 +85,10 @@ public class Poll implements Comparable<Poll>{
                 timeCreated,
                 timeUpdated,
                 deadline,
-                votingItems
-                        .stream()
+                votingItems.stream()
                         .sorted(Comparator.comparing(VotingItem::getVotingItemId))
-                        .map(VotingItem::toVotingItemResponse)
-                        .toList() // Convert votingItems to VotingItemResponse objects
+                        .map(votingItem -> votingItem.toVotingItemResponseWithChosen(checkedVotingItems.contains(votingItem.getVotingItemId())))
+                        .collect(Collectors.toList())
         );
     }
 

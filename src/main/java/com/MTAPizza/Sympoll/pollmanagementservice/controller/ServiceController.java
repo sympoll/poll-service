@@ -68,13 +68,14 @@ public class ServiceController {
     /**
      * Fetch all polls of a specific group.
      * @param groupId Group ID to fetch all its polls.
+     * @param userId Optional userId to fetch polls with user's choices.
      * @return List of all polls of the received group.
      */
     @GetMapping("/by-group-id")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByGroupId(@RequestParam String groupId){
+    public List<PollResponse> getPollsByGroupId(@RequestParam String groupId, @RequestParam(required = false) UUID userId){
         log.info("Received request to get all polls of group with ID: {}", groupId);
-        return pollService.getPollsByGroupId(groupId);
+        return pollService.getPollsByGroupId(groupId, userId);
     }
 
 
@@ -93,13 +94,14 @@ public class ServiceController {
     /**
      * Fetch all polls of multiple groups.
      * @param groupIds List of group IDs to fetch their polls.
+     * @param userId Optional userId to fetch polls with user's choices.
      * @return List of polls of the received groups, sorted by date posted, newest first.
      */
     @PostMapping("/by-multiple-group-ids")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<String> groupIds){
+    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<String> groupIds, @RequestParam(required = false) UUID userId){
         log.info("Received request to get all polls of groups with IDs: {}", groupIds);
-        return pollService.getPollsByMultipleGroupIds(groupIds);
+        return pollService.getPollsByMultipleGroupIds(groupIds, userId);
     }
 
     /**

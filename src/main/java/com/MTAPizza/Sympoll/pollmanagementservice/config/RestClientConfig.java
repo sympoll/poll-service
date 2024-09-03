@@ -12,7 +12,6 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
 public class RestClientConfig {
-
     @Value("${user.service.url}")
     private String userServiceUrl;
 
