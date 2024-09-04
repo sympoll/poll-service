@@ -1,6 +1,5 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.client;
 
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsResponse;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +18,5 @@ public interface UserClient {
     ResponseEntity<UserResponse> getUserById(@RequestParam UUID userId);
 
     @PostExchange("/api/user/list-by-user-ids")
-    ResponseEntity<List<UserResponse>> getUserNameList(@RequestBody List<UUID> userIds);
+    ResponseEntity<List<UserResponse>> getUsersListByIds(@RequestBody List<UUID> userIds);
 }
