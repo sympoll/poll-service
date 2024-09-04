@@ -11,6 +11,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesResponse;
@@ -117,9 +118,9 @@ public class PollService {
     private Map<UUID, String> getCreatorNames(Set<UUID> creatorIds) {
         try {
             log.info("Batch fetching creator names from user service");
-            ResponseEntity<List<UsernameResponse>> response = userClient.getUserNameList(new ArrayList<>(creatorIds));
+            ResponseEntity<List<UserResponse>> response = userClient.getUserNameList(new ArrayList<>(creatorIds));
             return Objects.requireNonNull(response.getBody()).stream()
-                    .collect(Collectors.toMap(UsernameResponse::userId, UsernameResponse::username));
+                    .collect(Collectors.toMap(UserResponse::userId, UserResponse::username));
         } catch (Exception e) {
             log.error("Failed to fetch creator names", e);
             return Collections.emptyMap();
