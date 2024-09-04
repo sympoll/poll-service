@@ -18,6 +18,6 @@ public interface UserClient {
     @GetExchange("/api/user/by-user-id")
     ResponseEntity<UserResponse> getUserById(@RequestParam UUID userId);
 
-    @PostExchange("/api/user/username-list")
-    ResponseEntity<List<UsernameResponse>> getUserNameList(@RequestBody List<UUID> userIds);
+    @PostExchange("/api/user/list-by-user-ids")
+    ResponseEntity<List<UserResponse>> getUserNameList(@RequestBody List<UUID> userIds);
 }
