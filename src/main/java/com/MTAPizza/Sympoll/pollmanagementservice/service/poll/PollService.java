@@ -91,7 +91,7 @@ public class PollService {
         return polls.stream()
                 .map(poll -> {
                     List<Integer> checkedVotingItems = userVotedItemsMap.getOrDefault(poll.getPollId(), Collections.emptyList());
-                    UserResponse creatorData = creatorsDataMap.getOrDefault(poll.getCreatorId(), null);
+                    UserResponse creatorData = creatorsDataMap.getOrDefault(poll.getCreatorId(), new UserResponse(null, "Unknown Creator", null, null, null));
                     String groupName = groupNamesMap.getOrDefault(poll.getGroupId(), "Unknown Group");
 
                     return poll.toPollResponse(creatorData, groupName, checkedVotingItems);
