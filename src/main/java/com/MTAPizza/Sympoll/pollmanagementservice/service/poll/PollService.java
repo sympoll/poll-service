@@ -5,7 +5,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
@@ -61,9 +61,9 @@ public class PollService {
 
         // Fetch creator data and group names asynchronously
         CompletableFuture<Map<UUID, UserResponse>> creatorsDataFuture = CompletableFuture.supplyAsync(() -> getUsersDataMap(creatorIds));
-        CompletableFuture<Map<String, String>> groupNamesFuture = CompletableFuture.supplyAsync(() -> getGroupNames(groupIds));
+        CompletableFuture<Map<String, GroupResponse>> groupsDataFuture = CompletableFuture.supplyAsync(() -> getGroupDataMap(groupIds));
 
-        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorsDataFuture, groupNamesFuture);
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorsDataFuture, groupsDataFuture);
         CompletableFuture<Map<UUID, List<Integer>>> votingItemsFuture = null;
 
         // Fetch user's choices if userId is provided
@@ -84,7 +84,7 @@ public class PollService {
 
         // Get results from futures
         Map<UUID, UserResponse> creatorsDataMap = creatorsDataFuture.join();
-        Map<String, String> groupNamesMap = groupNamesFuture.join();
+        Map<String, GroupResponse> groupsDataMap = groupsDataFuture.join();
         Map<UUID, List<Integer>> userVotedItemsMap = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyMap();
 
         // Create poll responses
@@ -92,9 +92,9 @@ public class PollService {
                 .map(poll -> {
                     List<Integer> checkedVotingItems = userVotedItemsMap.getOrDefault(poll.getPollId(), Collections.emptyList());
                     UserResponse creatorData = creatorsDataMap.getOrDefault(poll.getCreatorId(), new UserResponse(null, "Unknown Creator", null, null, null));
-                    String groupName = groupNamesMap.getOrDefault(poll.getGroupId(), "Unknown Group");
+                    GroupResponse groupData = groupsDataMap.getOrDefault(poll.getGroupId(), new GroupResponse(null, "Unknown Group", null));
 
-                    return poll.toPollResponse(creatorData, groupName, checkedVotingItems);
+                    return poll.toPollResponse(creatorData, groupData, checkedVotingItems);
                 })
                 .collect(Collectors.toList());
     }
@@ -115,7 +115,7 @@ public class PollService {
      */
     private Map<UUID, UserResponse> getUsersDataMap(Set<UUID> creatorIds) {
         try {
-            log.info("Batch fetching creator names from user service");
+            log.info("Batch fetching creators' data from user service");
             ResponseEntity<List<UserResponse>> response = userClient.getUsersListByIds(new ArrayList<>(creatorIds));
             return Objects.requireNonNull(response.getBody()).stream()
                     .collect(Collectors.toMap(UserResponse::userId, (userResponse) -> userResponse));
@@ -130,12 +130,12 @@ public class PollService {
      * @param groupIds Set of strings representing group IDs.
      * @return A map of group IDs to group names.
      */
-    private Map<String, String> getGroupNames(Set<String> groupIds) {
+    private Map<String, GroupResponse> getGroupDataMap(Set<String> groupIds) {
         try {
-            log.info("Batch fetching group names from group service");
-            ResponseEntity<List<GroupNameResponse>> response = groupClient.getGroupNameList(new ArrayList<>(groupIds));
+            log.info("Batch fetching groups' data from group service");
+            ResponseEntity<List<GroupResponse>> response = groupClient.getGroupDataList(new ArrayList<>(groupIds));
             return Objects.requireNonNull(response.getBody()).stream()
-                    .collect(Collectors.toMap(GroupNameResponse::groupId, GroupNameResponse::groupName));
+                    .collect(Collectors.toMap(GroupResponse::groupId, (groupResponse) -> groupResponse));
         } catch (Exception e) {
             log.error("Failed to fetch group names", e);
             return Collections.emptyMap();

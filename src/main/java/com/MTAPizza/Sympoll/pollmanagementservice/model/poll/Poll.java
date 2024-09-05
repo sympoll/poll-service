@@ -1,5 +1,6 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.voting.item.VotingItemResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
@@ -42,9 +43,6 @@ public class Poll implements Comparable<Poll>{
     @Column(name = "group_id")
     private String groupId;
 
-    @Transient
-    private String groupName;
-
     @Column(name = "time_created")
     private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.
 
@@ -64,13 +62,13 @@ public class Poll implements Comparable<Poll>{
      * including the creator's name, group name, and the user's checked voting items.
      *
      * @param creatorData        The data of the poll's creator.
-     * @param groupName          The name of the group associated with the poll.
+     * @param groupInfo          The data of the group associated with the poll.
      * @param checkedVotingItems  A list of voting item IDs that were checked by the user.
      *                           This is used to set the 'checked' field in the VotingItemResponse.
      * @return A PollResponse object that represents the current Poll,
      *         with voting items marked as checked if applicable.
      */
-    public PollResponse toPollResponse(UserResponse creatorData, String groupName, List<Integer> checkedVotingItems) {
+    public PollResponse toPollResponse(UserResponse creatorData, GroupResponse groupInfo, List<Integer> checkedVotingItems) {
         return new PollResponse(
                 this.pollId,
                 this.title,
@@ -80,7 +78,8 @@ public class Poll implements Comparable<Poll>{
                 creatorData.username(),
                 creatorData.profilePictureUrl(),
                 this.groupId,
-                groupName,
+                groupInfo.groupName(),
+                groupInfo.groupProfilePictureUrl(),
                 this.timeCreated,
                 this.timeUpdated,
                 this.deadline,

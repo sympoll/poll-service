@@ -17,6 +17,7 @@ public record PollResponse(
         String creatorProfilePictureUrl,
         String groupId,
         String groupName,
+        String groupProfilePictureUrl,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
         LocalDateTime timeCreated,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
