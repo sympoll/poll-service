@@ -1,5 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.model.poll;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.voting.item.VotingItemResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
@@ -38,14 +40,8 @@ public class Poll implements Comparable<Poll>{
     @Column(name = "creator_id")
     private UUID creatorId;
 
-    @Transient
-    private String creatorName;
-
     @Column(name = "group_id")
     private String groupId;
-
-    @Transient
-    private String groupName;
 
     @Column(name = "time_created")
     private final LocalDateTime timeCreated = LocalDateTime.now(); // Initialize to the current time.
@@ -65,27 +61,29 @@ public class Poll implements Comparable<Poll>{
      * This method populates the PollResponse with detailed information
      * including the creator's name, group name, and the user's checked voting items.
      *
-     * @param creatorName        The name of the poll's creator.
-     * @param groupName          The name of the group associated with the poll.
+     * @param creatorData        The data of the poll's creator.
+     * @param groupInfo          The data of the group associated with the poll.
      * @param checkedVotingItems  A list of voting item IDs that were checked by the user.
      *                           This is used to set the 'checked' field in the VotingItemResponse.
      * @return A PollResponse object that represents the current Poll,
      *         with voting items marked as checked if applicable.
      */
-    public PollResponse toPollResponse(String creatorName, String groupName, List<Integer> checkedVotingItems) {
+    public PollResponse toPollResponse(UserResponse creatorData, GroupResponse groupInfo, List<Integer> checkedVotingItems) {
         return new PollResponse(
-                pollId,
-                title,
-                description,
-                nofAnswersAllowed,
-                creatorId,
-                creatorName,
-                groupId,
-                groupName,
-                timeCreated,
-                timeUpdated,
-                deadline,
-                votingItems.stream()
+                this.pollId,
+                this.title,
+                this.description,
+                this.nofAnswersAllowed,
+                this.creatorId,
+                creatorData.username(),
+                creatorData.profilePictureUrl(),
+                this.groupId,
+                groupInfo.groupName(),
+                groupInfo.profilePictureUrl(),
+                this.timeCreated,
+                this.timeUpdated,
+                this.deadline,
+                this.votingItems.stream()
                         .sorted(Comparator.comparing(VotingItem::getVotingItemId))
                         .map(votingItem -> votingItem.toVotingItemResponseWithChosen(checkedVotingItems.contains(votingItem.getVotingItemId())))
                         .collect(Collectors.toList())

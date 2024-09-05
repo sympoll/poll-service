@@ -5,14 +5,12 @@ import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupNameResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UsernameResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedRequest;
@@ -61,11 +59,11 @@ public class PollService {
                 .map(Poll::getGroupId)
                 .collect(Collectors.toSet());
 
-        // Fetch creator and group names asynchronously
-        CompletableFuture<Map<UUID, String>> creatorNamesFuture = CompletableFuture.supplyAsync(() -> getCreatorNames(creatorIds));
-        CompletableFuture<Map<String, String>> groupNamesFuture = CompletableFuture.supplyAsync(() -> getGroupNames(groupIds));
+        // Fetch creator data and group names asynchronously
+        CompletableFuture<Map<UUID, UserResponse>> creatorsDataFuture = CompletableFuture.supplyAsync(() -> getUsersDataMap(creatorIds));
+        CompletableFuture<Map<String, GroupResponse>> groupsDataFuture = CompletableFuture.supplyAsync(() -> getGroupDataMap(groupIds));
 
-        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorNamesFuture, groupNamesFuture);
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(creatorsDataFuture, groupsDataFuture);
         CompletableFuture<Map<UUID, List<Integer>>> votingItemsFuture = null;
 
         // Fetch user's choices if userId is provided
@@ -85,18 +83,18 @@ public class PollService {
         combinedFuture.join();
 
         // Get results from futures
-        Map<UUID, String> creatorNames = creatorNamesFuture.join();
-        Map<String, String> groupNames = groupNamesFuture.join();
-        Map<UUID, List<Integer>> userVotedItems = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyMap();
+        Map<UUID, UserResponse> creatorsDataMap = creatorsDataFuture.join();
+        Map<String, GroupResponse> groupsDataMap = groupsDataFuture.join();
+        Map<UUID, List<Integer>> userVotedItemsMap = (votingItemsFuture != null) ? votingItemsFuture.join() : Collections.emptyMap();
 
         // Create poll responses
         return polls.stream()
                 .map(poll -> {
-                    List<Integer> checkedVotingItems = userVotedItems.getOrDefault(poll.getPollId(), Collections.emptyList());
-                    String creatorName = creatorNames.getOrDefault(poll.getCreatorId(), "Unknown Creator");
-                    String groupName = groupNames.getOrDefault(poll.getGroupId(), "Unknown Group");
+                    List<Integer> checkedVotingItems = userVotedItemsMap.getOrDefault(poll.getPollId(), Collections.emptyList());
+                    UserResponse creatorData = creatorsDataMap.getOrDefault(poll.getCreatorId(), new UserResponse(null, "Unknown Creator", null, null, null));
+                    GroupResponse groupData = groupsDataMap.getOrDefault(poll.getGroupId(), new GroupResponse(null, "Unknown Group", null));
 
-                    return poll.toPollResponse(creatorName, groupName, checkedVotingItems);
+                    return poll.toPollResponse(creatorData, groupData, checkedVotingItems);
                 })
                 .collect(Collectors.toList());
     }
@@ -111,16 +109,16 @@ public class PollService {
     }
 
     /**
-     * Fetches creator names using the user service.
+     * Fetches a map of users' data using the user service.
      * @param creatorIds Set of UUIDs representing creator IDs.
-     * @return A map of creator IDs to creator names.
+     * @return A map the users' data.
      */
-    private Map<UUID, String> getCreatorNames(Set<UUID> creatorIds) {
+    private Map<UUID, UserResponse> getUsersDataMap(Set<UUID> creatorIds) {
         try {
-            log.info("Batch fetching creator names from user service");
-            ResponseEntity<List<UserResponse>> response = userClient.getUserNameList(new ArrayList<>(creatorIds));
+            log.info("Batch fetching creators' data from user service");
+            ResponseEntity<List<UserResponse>> response = userClient.getUsersListByIds(new ArrayList<>(creatorIds));
             return Objects.requireNonNull(response.getBody()).stream()
-                    .collect(Collectors.toMap(UserResponse::userId, UserResponse::username));
+                    .collect(Collectors.toMap(UserResponse::userId, (userResponse) -> userResponse));
         } catch (Exception e) {
             log.error("Failed to fetch creator names", e);
             return Collections.emptyMap();
@@ -132,12 +130,12 @@ public class PollService {
      * @param groupIds Set of strings representing group IDs.
      * @return A map of group IDs to group names.
      */
-    private Map<String, String> getGroupNames(Set<String> groupIds) {
+    private Map<String, GroupResponse> getGroupDataMap(Set<String> groupIds) {
         try {
-            log.info("Batch fetching group names from group service");
-            ResponseEntity<List<GroupNameResponse>> response = groupClient.getGroupNameList(new ArrayList<>(groupIds));
+            log.info("Batch fetching groups' data from group service");
+            ResponseEntity<List<GroupResponse>> response = groupClient.getGroupDataList(new ArrayList<>(groupIds));
             return Objects.requireNonNull(response.getBody()).stream()
-                    .collect(Collectors.toMap(GroupNameResponse::groupId, GroupNameResponse::groupName));
+                    .collect(Collectors.toMap(GroupResponse::groupId, (groupResponse) -> groupResponse));
         } catch (Exception e) {
             log.error("Failed to fetch group names", e);
             return Collections.emptyMap();
@@ -392,9 +390,9 @@ public class PollService {
                 .map(VotingItem::getVotingItemId)
                 .collect(Collectors.toList());
 
-        ResponseEntity<DeleteMultipleVotesResponse> respone = voteClient.deleteMultipleVotes(new DeleteMultipleVotesRequest(allPollsVotingItemIds));
+        ResponseEntity<DeleteMultipleVotesResponse> response = voteClient.deleteMultipleVotes(new DeleteMultipleVotesRequest(allPollsVotingItemIds));
 
-        if (!respone.getStatusCode().is2xxSuccessful()) {
+        if (!response.getStatusCode().is2xxSuccessful()) {
             //TODO throw error.
         }
     }
