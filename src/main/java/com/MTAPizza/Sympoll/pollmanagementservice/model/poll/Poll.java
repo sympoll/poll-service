@@ -79,7 +79,7 @@ public class Poll implements Comparable<Poll>{
                 creatorData.profilePictureUrl(),
                 this.groupId,
                 groupInfo.groupName(),
-                groupInfo.groupProfilePictureUrl(),
+                groupInfo.profilePictureUrl(),
                 this.timeCreated,
                 this.timeUpdated,
                 this.deadline,
