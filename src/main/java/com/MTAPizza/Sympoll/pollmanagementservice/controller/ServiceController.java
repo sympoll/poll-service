@@ -1,5 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
@@ -66,13 +68,14 @@ public class ServiceController {
     /**
      * Fetch all polls of a specific group.
      * @param groupId Group ID to fetch all its polls.
+     * @param userId Optional userId to fetch polls with user's choices.
      * @return List of all polls of the received group.
      */
     @GetMapping("/by-group-id")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByGroupId(@RequestParam String groupId){
+    public List<PollResponse> getPollsByGroupId(@RequestParam String groupId, @RequestParam(required = false) UUID userId){
         log.info("Received request to get all polls of group with ID: {}", groupId);
-        return pollService.getPollsByGroupId(groupId);
+        return pollService.getPollsByGroupId(groupId, userId);
     }
 
 
@@ -91,13 +94,14 @@ public class ServiceController {
     /**
      * Fetch all polls of multiple groups.
      * @param groupIds List of group IDs to fetch their polls.
+     * @param userId Optional userId to fetch polls with user's choices.
      * @return List of polls of the received groups, sorted by date posted, newest first.
      */
     @PostMapping("/by-multiple-group-ids")
     @ResponseStatus(HttpStatus.OK)
-    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<String> groupIds){
+    public List<PollResponse> getPollsByMultipleGroupIds(@RequestBody List<String> groupIds, @RequestParam(required = false) UUID userId){
         log.info("Received request to get all polls of groups with IDs: {}", groupIds);
-        return pollService.getPollsByMultipleGroupIds(groupIds);
+        return pollService.getPollsByMultipleGroupIds(groupIds, userId);
     }
 
     /**
@@ -146,5 +150,17 @@ public class ServiceController {
     public VoteCountResponse getVoteCount(@RequestBody VoteCountRequest voteCountRequest) {
         log.info("Received request to retrieve vote count");
         return votingItemService.getVoteCount(voteCountRequest);
+    }
+
+    /**
+     * Deleting all polls related to the given group id.
+     * @param deleteGroupPollsRequest The given group id.
+     * @return A DTO with the removed poll ids.
+     */
+    @DeleteMapping("by-group-id")
+    @ResponseStatus(HttpStatus.OK)
+    public DeleteGroupPollsResponse deleteGroupPolls(@RequestBody DeleteGroupPollsRequest deleteGroupPollsRequest) {
+        log.info("Received request to delete all group's polls");
+        return pollService.deleteGroupPolls(deleteGroupPollsRequest);
     }
 }

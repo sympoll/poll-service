@@ -31,6 +31,22 @@ public class VotingItem {
         return new VotingItemResponse(
                 votingItemId,
                 description,
+                false,
+                voteCount
+        );
+    }
+
+    /**
+     * Converts the VotingItem to a VotingItemResponse, setting the checked field as specified.
+     *
+     * @param isChecked Whether this voting item is checked by the user.
+     * @return A VotingItemResponse with the checked field set.
+     */
+    public VotingItemResponse toVotingItemResponseWithChosen(boolean isChecked) {
+        return new VotingItemResponse(
+                votingItemId,
+                description,
+                isChecked, // Set the checked field based on the passed argument
                 voteCount
         );
     }
