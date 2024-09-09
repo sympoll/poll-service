@@ -112,7 +112,11 @@ if relevant.
     "description": "string",
     "nofAnswersAllowed": 0,
     "creatorId": "string",
+    "creatorName": "string",
+    "creatorProfilePictureUrl": "string",
     "groupId": "string",
+    "groupName": "string",
+    "groupProfilePictureUrl": "string",
     "timeCreated": "2024-07-27T00:00:00Z",
     "timeUpdated": "2024-07-27T00:00:00Z",
     "deadline": "2024-07-27T00:00:00Z",
@@ -154,7 +158,11 @@ if relevant.
         "description": "string",
         "nofAnswersAllowed": 0,
         "creatorId": "string",
+        "creatorName": "string",
+        "creatorProfilePictureUrl": "string",
         "groupId": "string",
+        "groupName": "string",
+        "groupProfilePictureUrl": "string",
         "timeCreated": "2024-07-27T00:00:00Z",
         "timeUpdated": "2024-07-27T00:00:00Z",
         "deadline": "2024-07-27T00:00:00Z",
@@ -195,7 +203,11 @@ if relevant.
     "description": "string",
     "nofAnswersAllowed": 0,
     "creatorId": "string",
+    "creatorName": "string",
+    "creatorProfilePictureUrl": "string",
     "groupId": "string",
+    "groupName": "string",
+    "groupProfilePictureUrl": "string",
     "timeCreated": "2024-07-27T00:00:00Z",
     "timeUpdated": "2024-07-27T00:00:00Z",
     "deadline": "2024-07-27T00:00:00Z",
@@ -217,7 +229,163 @@ if relevant.
 
 ---
 
-#### 2.3.4) Delete a Poll
+#### 2.3.4) Get Polls by group ID
+
+- **Method:**  GET
+
+- **Endpoint:**  `/by-group-id`
+
+- **Description:**  Retrieves all group polls by group ID.
+
+- **Query Parameters:**
+  - `groupId` (string) – The ID of the group.
+
+- **Response:**
+
+```json
+[
+    {
+        "pollId": "uuid",
+        "title": "string",
+        "description": "string",
+        "nofAnswersAllowed": 0,
+        "creatorId": "string",
+        "creatorName": "string",
+        "creatorProfilePictureUrl": "string",
+        "groupId": "string",
+        "groupName": "string",
+        "groupProfilePictureUrl": "string",
+        "timeCreated": "2024-07-27T00:00:00Z",
+        "timeUpdated": "2024-07-27T00:00:00Z",
+        "deadline": "2024-07-27T00:00:00Z",
+        "votingItems": [
+            {
+                "votingItemId": "uuid",
+                "votingItemOrdinal": 0,
+                "description": "string",
+                "voteCount": 0
+            }
+        ]
+    }
+]
+```
+
+
+
+- **Response HTTP Status:**
+  - `200 OK` – Polls successfully retrieved.
+
+  - `404 Not Found` – Group with the specified ID not found.
+  
+  - `404 Not Found` – Poll with the specified ID not found.
+
+---
+
+#### 2.3.5) Get Polls by user ID
+
+- **Method:**  GET
+
+- **Endpoint:**  `/by-user-id`
+
+- **Description:**  Retrieves all user polls by user ID.
+
+- **Query Parameters:**
+  - `userId` (UUID) – The ID of the user.
+
+- **Response:**
+
+```json
+[
+    {
+        "pollId": "uuid",
+        "title": "string",
+        "description": "string",
+        "nofAnswersAllowed": 0,
+        "creatorId": "string",
+        "creatorName": "string",
+        "creatorProfilePictureUrl": "string",
+        "groupId": "string",
+        "groupName": "string",
+        "groupProfilePictureUrl": "string",
+        "timeCreated": "2024-07-27T00:00:00Z",
+        "timeUpdated": "2024-07-27T00:00:00Z",
+        "deadline": "2024-07-27T00:00:00Z",
+        "votingItems": [
+            {
+                "votingItemId": "uuid",
+                "votingItemOrdinal": 0,
+                "description": "string",
+                "voteCount": 0
+            }
+        ]
+    }
+]
+```
+
+
+
+- **Response HTTP Status:**
+  - `200 OK` – Polls successfully retrieved.
+
+  - `404 Not Found` – User with the specified ID not found.
+  
+  - `404 Not Found` – Poll with the specified ID not found.
+
+---
+
+#### 2.3.6) Get Polls by nultiple group IDs
+
+- **Method:**  GET
+
+- **Endpoint:**  `/by-multiple-group-ids`
+
+- **Description:**  Retrieves all multiple groups polls by groups IDs.
+
+- **Query Parameters:**
+  - `groupId` (List<string>) – The ID of the group.
+
+- **Response:**
+
+```json
+[
+    {
+        "pollId": "uuid",
+        "title": "string",
+        "description": "string",
+        "nofAnswersAllowed": 0,
+        "creatorId": "string",
+        "creatorName": "string",
+        "creatorProfilePictureUrl": "string",
+        "groupId": "string",
+        "groupName": "string",
+        "groupProfilePictureUrl": "string",
+        "timeCreated": "2024-07-27T00:00:00Z",
+        "timeUpdated": "2024-07-27T00:00:00Z",
+        "deadline": "2024-07-27T00:00:00Z",
+        "votingItems": [
+            {
+                "votingItemId": "uuid",
+                "votingItemOrdinal": 0,
+                "description": "string",
+                "voteCount": 0
+            }
+        ]
+    }
+]
+```
+
+
+
+- **Response HTTP Status:**
+  - `200 OK` – Polls successfully retrieved.
+
+  - `404 Not Found` – Group with the specified ID not found.
+  
+  - `404 Not Found` – Poll with the specified ID not found.
+
+---
+
+#### 2.3.7) Delete a Poll
 
 - **Method:**  DELETE
 
@@ -249,7 +417,7 @@ if relevant.
 
 ---
 
-#### 2.3.5) Health Check
+#### 2.3.8) Health Check
 
 - **Method:**  GET
 
@@ -271,7 +439,7 @@ if relevant.
 
 ---
 
-#### 2.3.6) Vote on Poll
+#### 2.3.9) Vote on Poll
 
 - **Method:**  PUT
 
@@ -283,7 +451,7 @@ if relevant.
 
 ```json
 {
-    "votingItemId": "uuid",
+    "votingItemId": "int",
     "action": "add" // or "remove"
 }
 ```
@@ -299,6 +467,70 @@ if relevant.
 
 - **Response HTTP Status:**
   - `200 OK` – Vote count successfully updated.
+
+---
+
+#### 2.3.10) Get Vote count
+
+- **Method:**  GET
+
+- **Endpoint:**  `/vote`
+
+- **Description:**  Retrieve the vote count for a specified voting item.
+
+- **Request Body:**
+
+```json
+{
+    "votingItemId": int
+}
+```
+
+- **Response:**
+
+```json
+{
+    "voteCount": int
+}
+```
+
+- **Response HTTP Status:**
+  - `200 OK` – Vote count successfully retrieved.
+
+---
+
+#### 2.3.11) Delete group Polls
+
+- **Method:**  DELETE
+
+- **Endpoint:**  `/by-group-id`
+
+- **Description:**  Deletes all group Polls from DB.
+
+- **Request Body:**
+
+```json
+{
+    "groupId": "string"
+}
+```
+
+- **Response:**
+
+```json
+{
+    [
+        {
+            "pollId": "uuid"
+        }
+    ]
+}
+```
+
+- **Response HTTP Status:**
+  - `200 OK` – All Polls successfully deleted.
+    
+  - `404 Not Found` – Group with the specified ID not found.
 
 <br />
 
