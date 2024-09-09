@@ -482,7 +482,7 @@ if relevant.
 
 ```json
 {
-    "votingItemId": int
+    "votingItemId": "int"
 }
 ```
 
@@ -490,7 +490,7 @@ if relevant.
 
 ```json
 {
-    "voteCount": int
+    "voteCount": "int"
 }
 ```
 
