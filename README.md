@@ -1,18 +1,24 @@
 # Poll Service
 ## Table of Contents
 
-[1. About](#1-about)   
-[2. Architecture](#2-architecture)   
-&emsp; [2.1 Ports](#21-ports)   
-&emsp; [2.2 Poll Management Service Schema](#22-poll-management-service-schema)   
-&emsp; [2.3 Endpoints](#23-endpoints)   
-&emsp; &emsp; [2.3.1 Create a Poll](#231-create-a-poll)   
-&emsp; &emsp; [2.3.2 Get All Polls](#232-get-all-polls)   
-&emsp; &emsp; [2.3.3 Get Poll by ID](#233-get-poll-by-id)   
-&emsp; &emsp; [2.3.4 Delete a Poll](#234-delete-a-poll)   
-&emsp; &emsp; [2.3.5 Health Check](#235-health-check)   
-&emsp; &emsp; [2.3.6 Vote on Poll](#236-vote-on-poll)   
-[3. Error Codes](#3-error-codes)   
+[1. About](#1-about)  
+[2. Architecture](#2-architecture)  
+  - [2.1 Ports](#21-ports)  
+  - [2.2 Poll Management Service Schema](#22-poll-management-service-schema)  
+  - [2.3 Endpoints](#23-endpoints)  
+    - [2.3.1 Create a Poll](#231-create-a-poll)  
+    - [2.3.2 Get All Polls](#232-get-all-polls)  
+    - [2.3.3 Get Poll by ID](#233-get-poll-by-id)  
+    - [2.3.4 Get Polls by group ID](#234-get-polls-by-group-id)  
+    - [2.3.5 Get Polls by user ID](#235-get-polls-by-user-id)  
+    - [2.3.6 Get Polls by multiple group IDs](#236-get-polls-by-multiple-group-ids)  
+    - [2.3.7 Delete a Poll](#237-delete-a-poll)  
+    - [2.3.8 Health check](#238-health-check)  
+    - [2.3.9 Vote on Poll](#239-vote-on-poll)  
+    - [2.3.10 Get Vote count](#2310-get-vote-count)  
+    - [2.3.11 Delete group Polls](#2311-delete-group-polls)
+
+[3. Error Codes](#3-error-codes)  
 [4. Notes](#4-notes)
 
 <br />
