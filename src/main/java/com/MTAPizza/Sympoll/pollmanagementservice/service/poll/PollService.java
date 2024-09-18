@@ -18,6 +18,7 @@ import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesRe
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.request.RequestFailedException;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -277,6 +278,10 @@ public class PollService {
 
     @Transactional
     public PollUpdateResponse updatePoll(PollUpdateRequest pollUpdateRequest) {
+        if (pollUpdateRequest.pollId() == null) {
+            throw new RequestFailedException("Poll ID cannot be null.");
+        }
+
         validator.validateDeletePollRequest(new PollDeleteRequest(
                 pollUpdateRequest.pollId(),
                 pollUpdateRequest.userId(),
