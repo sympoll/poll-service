@@ -6,15 +6,18 @@ import com.MTAPizza.Sympoll.pollmanagementservice.client.VoteClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.GroupResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.create.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.update.PollUpdateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.update.PollUpdateResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.user.UserResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.DeleteMultipleVotesResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.choice.VotingItemsCheckedResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.exception.not.found.ResourceNotFoundException;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.voting.item.VotingItem;
 import com.MTAPizza.Sympoll.pollmanagementservice.model.poll.Poll;
 import com.MTAPizza.Sympoll.pollmanagementservice.repository.poll.PollRepository;
@@ -270,6 +273,33 @@ public class PollService {
         pollRepository.deleteById(pollDeleteRequest.pollId());
         log.info("POLL: {} was deleted.", pollDeleteRequest.pollId());
         return new PollDeleteResponse(pollDeleteRequest.pollId());
+    }
+
+    @Transactional
+    public PollUpdateResponse updatePoll(PollUpdateRequest pollUpdateRequest) {
+        validator.validateDeletePollRequest(new PollDeleteRequest(
+                pollUpdateRequest.pollId(),
+                pollUpdateRequest.userId(),
+                pollUpdateRequest.groupId()
+        ));
+
+        log.info("Updating the poll with ID: {}", pollUpdateRequest.pollId());
+        Optional<Poll> pollToUpdate = pollRepository.findById(pollUpdateRequest.pollId());
+        if (pollToUpdate.isPresent()) {
+            Poll poll = pollToUpdate.get();
+            poll.setTitle(pollUpdateRequest.title());
+            poll.setDescription(pollUpdateRequest.description());
+            pollRepository.save(poll);
+            log.info("Poll with ID: {} was updated successfully.", pollUpdateRequest.pollId());
+            return new PollUpdateResponse(
+                    poll.getPollId(),
+                    poll.getTitle(),
+                    poll.getDescription()
+            );
+        } else {
+            log.error("Could not find poll with ID: {}", pollUpdateRequest.pollId());
+            throw new ResourceNotFoundException("Could not find poll with ID: " + pollUpdateRequest.pollId());
+        }
     }
 
     /**
