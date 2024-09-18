@@ -3,10 +3,12 @@ package com.MTAPizza.Sympoll.pollmanagementservice.controller;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.DeleteGroupPollsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.health.HealthResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.create.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.update.PollUpdateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.update.PollUpdateResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.count.VoteCountRequest;
@@ -115,6 +117,18 @@ public class ServiceController {
         log.info("Received request to delete poll with ID {}", pollDeleteRequest.pollId());
         log.debug("Poll ID received to delete: {}", pollDeleteRequest.pollId());
         return pollService.deletePoll(pollDeleteRequest);
+    }
+
+    /**
+     * Update a poll's details.
+     * @param pollUpdateRequest Details of the poll to update, and the new details.
+     * @return ID of the updated poll and the newly saved details.
+     */
+    @PostMapping("/by-poll-id")
+    @ResponseStatus(HttpStatus.OK)
+    public PollUpdateResponse updatePoll(@RequestBody PollUpdateRequest pollUpdateRequest){
+        log.info("Received request to update the poll with ID: {}", pollUpdateRequest.pollId());
+        return pollService.updatePoll(pollUpdateRequest);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.MTAPizza.Sympoll.pollmanagementservice.dto.poll;
+package com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.create;
 
 import java.util.List;
 import java.util.UUID;

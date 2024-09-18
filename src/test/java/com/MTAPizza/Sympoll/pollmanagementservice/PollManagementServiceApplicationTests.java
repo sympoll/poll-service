@@ -1,8 +1,7 @@
 package com.MTAPizza.Sympoll.pollmanagementservice;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.error.IllegalArgumentResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.group.UserGroupsResponse;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.create.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.vote.VoteResponse;

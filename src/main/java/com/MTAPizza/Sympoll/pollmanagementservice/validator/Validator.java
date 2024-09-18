@@ -2,7 +2,7 @@ package com.MTAPizza.Sympoll.pollmanagementservice.validator;
 
 import com.MTAPizza.Sympoll.pollmanagementservice.client.GroupClient;
 import com.MTAPizza.Sympoll.pollmanagementservice.client.UserClient;
-import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.PollCreateRequest;
+import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.create.PollCreateRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.poll.delete.PollDeleteRequest;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.group.GroupIdExistsResponse;
 import com.MTAPizza.Sympoll.pollmanagementservice.dto.validator.user.UserIdExistsResponse;
