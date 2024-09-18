@@ -126,7 +126,7 @@ public class ServiceController {
      */
     @PostMapping("/by-poll-id")
     @ResponseStatus(HttpStatus.OK)
-    public PollUpdateResponse updatePoll(@RequestParam PollUpdateRequest pollUpdateRequest){
+    public PollUpdateResponse updatePoll(@RequestBody PollUpdateRequest pollUpdateRequest){
         log.info("Received request to update the poll with ID: {}", pollUpdateRequest.pollId());
         return pollService.updatePoll(pollUpdateRequest);
     }
